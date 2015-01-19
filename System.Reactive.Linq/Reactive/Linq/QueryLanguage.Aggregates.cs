@@ -141,11 +141,16 @@ namespace System.Reactive.Linq
 
         #region + Average +
 
-        public virtual IObservable<double> Average(IObservable<double> source)
+//发现要找的Average
+public virtual IObservable<double> Average(IObservable<double> source)
         {
 #if !NO_PERF
+//发现下面可能是一种实现
             return new AverageDouble(source);
 #else
+//发现另一种实现是用现有的Linq实现了Average
+//因此应当看看上面那种实现
+//从宏上看应当不是不讲究性能的版本
             return source.Scan(new { sum = 0.0, count = 0L },
                                (prev, cur) => new { sum = prev.sum + cur, count = checked(prev.count + 1) })
                 .Final()
