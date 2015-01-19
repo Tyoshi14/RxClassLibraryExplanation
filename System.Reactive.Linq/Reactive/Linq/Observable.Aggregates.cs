@@ -156,7 +156,7 @@ namespace System.Reactive.Linq
         {
             if (source == null)
                 throw new ArgumentNullException("source");
-
+//首先需要理解s_impl来自哪里是什么。
             return s_impl.Average(source);
         }
 
