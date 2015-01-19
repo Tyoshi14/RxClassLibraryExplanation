@@ -7,6 +7,7 @@ namespace System.Reactive.Linq
     /// </summary>
     public static partial class Observable
     {
+//s_impl来自这里。因此需要看看GetQueryImpl方法和QueryLanguage类。
         private static IQueryLanguage s_impl = QueryServices.GetQueryImpl<IQueryLanguage>(new QueryLanguage());
     }
 }
