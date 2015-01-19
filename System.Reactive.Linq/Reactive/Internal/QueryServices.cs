@@ -13,6 +13,7 @@ namespace System.Reactive.Linq
 //Lazy<T>.Value是System.Lazy<T>系统自带的属性其解释是
 //Gets the lazily initialized value of the current System.Lazy<T> instance.
 //Lazy<T>和Nullable<T>可以类比这学，可以认为是对T Value的一个包装。自己回去看就好了不是阅读Rx的重点。
+//下面看Extend是怎么回事。
         public static T GetQueryImpl<T>(T defaultInstance)
         {
             return s_services.Value.Extend(defaultInstance);
@@ -26,6 +27,7 @@ namespace System.Reactive.Linq
 
     internal interface IQueryServices
     {
+//Extend的接口定义在此。那Lazy<IQueryServices>.Value.Extend用到的实现呢？
         T Extend<T>(T baseImpl);
     }
 
