@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace TestProject
 {
@@ -25,7 +27,31 @@ namespace TestProject
                 Console.WriteLine("{0} {1}", item.Key, item.Value);
             }
 
+
+ // I find these codes on the web to see how Rx works.
+            // Rx 中  Observable 类对 IObservable 进行了扩展，增加了一些静态，例如代码中的Interval的方法，可以供user使用。
+            // Subscribe方法 不在 Rx 的命名空间之下，但是也是采用同样的方法实现了对 IObservable 的方法扩展。
+
+            IObservable<long> source =Observable.Interval(TimeSpan.FromSeconds(1));
+
+            IDisposable subscription1 = source.Subscribe(
+                            x => Console.WriteLine("Observer 1: OnNext: {0}", x),
+                            ex => Console.WriteLine("Observer 1: OnError: {0}", ex.Message),
+                            () => Console.WriteLine("Observer 1: OnCompleted"));
+
+            IDisposable subscription2 = source.Subscribe(
+                            x => Console.WriteLine("Observer 2: OnNext: {0}", x),
+                            ex => Console.WriteLine("Observer 2: OnError: {0}", ex.Message),
+                            () => Console.WriteLine("Observer 2: OnCompleted"));
+
+            Console.WriteLine("Press any key to unsubscribe");
             Console.ReadLine();
+            subscription1.Dispose();
+            subscription2.Dispose();
+
+
+            Console.ReadLine();
+
         }
     }
 
@@ -51,5 +77,6 @@ namespace TestProject
             return result;
         }
     }
+
 
 }
