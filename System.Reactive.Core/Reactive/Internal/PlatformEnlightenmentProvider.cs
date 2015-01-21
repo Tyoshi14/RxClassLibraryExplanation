@@ -42,6 +42,7 @@ namespace System.Reactive.PlatformServices
         /// <remarks>
         /// This member is used by the Rx infrastructure and not meant for public consumption or implementation.
         /// </remarks>
+//首先发现Current在此
         public static IPlatformEnlightenmentProvider Current
         {
             get
@@ -69,7 +70,7 @@ namespace System.Reactive.PlatformServices
                             asm.Name = "System.Reactive.PlatformServices";
                             var name = "System.Reactive.PlatformServices.CurrentPlatformEnlightenmentProvider, " + asm.FullName;
 #endif
-
+//第四步发现要判断name啥啥的
                             var t = Type.GetType(name, false);
                             if (t != null)
                                 s_current = (IPlatformEnlightenmentProvider)Activator.CreateInstance(t);
@@ -78,10 +79,10 @@ namespace System.Reactive.PlatformServices
                         }
                     }
                 }
-
+//然后发现优先返回s_current的逻辑
                 return s_current;
             }
-
+//第三步看到s_current只有set可以初始化
             set
             {
                 lock (s_gate)
@@ -96,6 +97,8 @@ namespace System.Reactive.PlatformServices
     {
         public T GetService<T>(object[] args) where T : class
         {
+//第五步意识到DefaultPlatformEnlightenmentProvider的GetService会返回null从而使得这一支没有价值
+//加上脑力不足（Stack overflow）回到上一级（pop）
             return null;
         }
     }
