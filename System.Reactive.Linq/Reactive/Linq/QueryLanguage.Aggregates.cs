@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 namespace System.Reactive.Linq
 {
 #if !NO_PERF
+    // 应用 ObservableImpl 空间下的类，ObservableImpl空间下为方法的具体实现类。---By Tyoshi
     using ObservableImpl;
 #endif
 
@@ -14,11 +15,18 @@ namespace System.Reactive.Linq
     {
         #region + Aggregate +
 
-        public virtual IObservable<TAccumulate> Aggregate<TSource, TAccumulate>(IObservable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> accumulator)
+
+        public  IObservable<TAccumulate> Aggregate<TSource, TAccumulate>(IObservable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> accumulator)
         {
+            // NO_PERF标签 用于两种 performance之间的转换。
 #if !NO_PERF
+            // 这里追踪到了 Aggregate 函数的调用过程。
+            // Observable.Aggregate()----> QueryLanguage.Aggregate()---> Aggregate.cs 
+            // new Aggregate() 前三个变量是从调用函数里面得到的，第四个变量 Stubs().I 代表一 Func<T, T> 函数代理, 作用是创建一个Aggregate对象。
+
             return new Aggregate<TSource, TAccumulate, TAccumulate>(source, seed, accumulator, Stubs<TAccumulate>.I);
 #else
+            //  AnonymouseObservable performance 是增强模式，不是经常用到。
             return source.Scan(seed, accumulator).StartWith(seed).Final();
 #endif
         }

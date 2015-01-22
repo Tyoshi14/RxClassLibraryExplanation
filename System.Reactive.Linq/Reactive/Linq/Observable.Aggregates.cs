@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace System.Reactive.Linq
 {
+    // partial 关键字代表 可以将 Observable 类分开书写在不同的文件中，与其他该类下独立文件并列存在，并且保持了 Observable 类的完整性。
+    // Observable 中所有静态函数的实现 第一个参数 this IObservable<TSource> source 中 this 的作用是对 IObservable 类型方法的拓展，
+    //使用时可以直接用 .MethodName 的形式获取。   --By Tyoshi
     public static partial class Observable
     {
         #region + Aggregate +
@@ -27,7 +30,8 @@ namespace System.Reactive.Linq
                 throw new ArgumentNullException("source");
             if (accumulator == null)
                 throw new ArgumentNullException("accumulator");
-
+            // s_impl 是 一个 IQueryLanguage 实现类对象，调用Aggregate() 方法。
+            // 寻找 Aggregate（） 方法的实现。
             return s_impl.Aggregate<TSource, TAccumulate>(source, seed, accumulator);
         }
 

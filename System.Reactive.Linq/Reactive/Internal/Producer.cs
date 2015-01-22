@@ -22,6 +22,10 @@ namespace System.Reactive
             if (observer == null)
                 throw new ArgumentNullException("observer");
 
+            // SingleAssignmentDisposable 是什么样的类？完成的是什么样的功能？
+            //Class description： Represents a disposable resource which only allows a single assignment of its underlying disposable resource
+            //  -By Tyoshi
+
             var sink = new SingleAssignmentDisposable();
             var subscription = new SingleAssignmentDisposable();
 

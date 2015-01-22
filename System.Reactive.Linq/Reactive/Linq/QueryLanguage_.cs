@@ -2,6 +2,7 @@
 
 namespace System.Reactive.Linq
 {
+    // QueryLanguage类实现的一部分，继承接口，实现借口内容。
     internal partial class QueryLanguage : IQueryLanguage
     {
     }

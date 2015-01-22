@@ -5,6 +5,9 @@ using System;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    // Aggregate 继承Producer类，该类的描述为：
+    //Base class for implementation of query operators, providing performance benefits over the use of Observable.Create。
+
     class Aggregate<TSource, TAccumulate, TResult> : Producer<TResult>
     {
         private readonly IObservable<TSource> _source;
@@ -12,6 +15,7 @@ namespace System.Reactive.Linq.ObservableImpl
         private readonly Func<TAccumulate, TSource, TAccumulate> _accumulator;
         private readonly Func<TAccumulate, TResult> _resultSelector;
 
+        // Aggregate类的构造函数。
         public Aggregate(IObservable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> accumulator, Func<TAccumulate, TResult> resultSelector)
         {
             _source = source;
