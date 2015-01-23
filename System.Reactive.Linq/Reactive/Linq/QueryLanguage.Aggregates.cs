@@ -22,8 +22,7 @@ namespace System.Reactive.Linq
 #if !NO_PERF
             // 这里追踪到了 Aggregate 函数的调用过程。
             // Observable.Aggregate()----> QueryLanguage.Aggregate()---> Aggregate.cs 
-            // new Aggregate() 前三个变量是从调用函数里面得到的，第四个变量 Stubs().I 代表一 Func<T, T> 函数代理, 作用是创建一个Aggregate对象。
-
+            // new Aggregate() 前三个变量是从调用函数里面得到的，第四个变量 Stubs().I 代表一 Func<T, T> 函数代理, 返回一个Aggregate对象。
             return new Aggregate<TSource, TAccumulate, TAccumulate>(source, seed, accumulator, Stubs<TAccumulate>.I);
 #else
             //  AnonymouseObservable performance 是增强模式，不是经常用到。

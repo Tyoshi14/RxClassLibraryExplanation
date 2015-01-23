@@ -21,6 +21,8 @@ namespace System.Reactive.Concurrency
         /// <summary>
         /// Gets the singleton instance of the current thread scheduler.
         /// </summary>
+        /// CurrentThreadScheduler 的构造函数是private的，用这种方法返回CurrentThreadScheduler类的一个Object，保证类的安全性
+        ///     --- By Tyoshi
         public static CurrentThreadScheduler Instance
         {
             get { return s_instance; }

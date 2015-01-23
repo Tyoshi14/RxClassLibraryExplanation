@@ -2,6 +2,9 @@
 
 namespace System.Reactive
 {
+    // 该命名空间下定义了多种观察者类型, 新观察者类型都继承IObserver接口。 ---By Tyoshi
+
+    // NopObserver<T> 空观察者
     class NopObserver<T> : IObserver<T>
     {
         public static readonly IObserver<T> Instance = new NopObserver<T>();

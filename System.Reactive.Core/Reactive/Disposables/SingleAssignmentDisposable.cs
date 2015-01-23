@@ -39,6 +39,7 @@ namespace System.Reactive.Disposables
         /// <exception cref="InvalidOperationException">Thrown if the SingleAssignmentDisposable has already been assigned to.</exception>
         public IDisposable Disposable
         {
+            // 定义Disposable变量，并且定义了其 get 和 set  方法。
             get
             {
                 var current = _current;
@@ -52,6 +53,10 @@ namespace System.Reactive.Disposables
             set
             {
 #pragma warning disable 0420
+                // InterLocked 是一个线程控制类。CompageExchange（）方法描述为
+                //Compares two instances of the specified reference type T for equality and, if they are equal, replaces one of them.
+                // ref in C# 表示 引用类型， 在进入函数前已经得到初始化。
+                //   -----By Tyoshi
                 var old = Interlocked.CompareExchange(ref _current, value, null);
 #pragma warning restore 0420
                 if (old == null)

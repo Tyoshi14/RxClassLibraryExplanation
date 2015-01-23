@@ -5,9 +5,9 @@ using System;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
-    // Aggregate 继承Producer类，该类的描述为：
-    //Base class for implementation of query operators, providing performance benefits over the use of Observable.Create。
-
+    // Aggregate 继承Producer类，Observable.Aggregate() 方法的底层实现。 
+    //Producer类的描述为：Base class for implementation of query operators, providing performance benefits over the use of Observable.Create。
+    // Producer类只包含两个方法 IDisposable Subscribe() 和 abstract IDisposable Run() .
     class Aggregate<TSource, TAccumulate, TResult> : Producer<TResult>
     {
         private readonly IObservable<TSource> _source;
@@ -24,12 +24,20 @@ namespace System.Reactive.Linq.ObservableImpl
             _resultSelector = resultSelector;
         }
 
+     
+        ///  每个Producer实现类都必须重载的函数
         protected override IDisposable Run(IObserver<TResult> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
             var sink = new _(this, observer, cancel);
+        // 封装 _ 对象为一个方法。
             setSink(sink);
+        // 调用 ObservableExtensions 类中的SubscribeSafe() 方法, 订阅一个资源。
+       //ObservableExtensions provides a set of static methods for subscribing delegates to observables.
             return _source.SubscribeSafe(sink);
         }
+
+        // _ 为 Aggregate<TSource, TAccumulate, TResult> 的内部类,继承Sink类和IObserver接口。完成？？？功能。
+        // Sink类功能： Base class for implementation of query operators, providing a lightweight sink that can be disposed to mute the outgoing observer.
 
         class _ : Sink<TResult>, IObserver<TSource>
         {
@@ -64,9 +72,11 @@ namespace System.Reactive.Linq.ObservableImpl
 
             public void OnCompleted()
             {
+                // default() 是什么意思？？
                 var result = default(TResult);
                 try
                 {
+               // 由之前 observable.arragates（） 传进来的参数 Stubs<TAccumulate>.I知，仅需要一个参数。
                     result = _parent._resultSelector(_accumulation);
                 }
                 catch (Exception exception)
@@ -76,6 +86,7 @@ namespace System.Reactive.Linq.ObservableImpl
                     return;
                 }
 
+                // 调用基类sink的 onNext() OnCompleted() 方法。
                 base._observer.OnNext(result);
                 base._observer.OnCompleted();
                 base.Dispose();
@@ -83,6 +94,8 @@ namespace System.Reactive.Linq.ObservableImpl
         }
     }
 
+
+    // 两个不同的Aggregate 类，两个类之间的区别是什么？
     class Aggregate<TSource> : Producer<TSource>
     {
         private readonly IObservable<TSource> _source;

@@ -32,6 +32,8 @@ namespace System.Reactive
             }
         }
 
+    // 返回一个观察着对象，观察对象里面封装了对IObserver接口的重载。
+    // 不明白为什么要新建一个类 _ 来实现_observer 的三个功能。
         public IObserver<TSource> GetForwarder()
         {
             return new _(this);
@@ -46,6 +48,7 @@ namespace System.Reactive
                 _forward = forward;
             }
 
+            // Provides the observer with new data. 
             public void OnNext(TSource value)
             {
                 _forward._observer.OnNext(value);

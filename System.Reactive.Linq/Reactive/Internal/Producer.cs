@@ -25,12 +25,17 @@ namespace System.Reactive
             // SingleAssignmentDisposable 是什么样的类？完成的是什么样的功能？
             //Class description： Represents a disposable resource which only allows a single assignment of its underlying disposable resource
             //  -By Tyoshi
-
             var sink = new SingleAssignmentDisposable();
             var subscription = new SingleAssignmentDisposable();
 
+            // CurrentThreadScheduler 是一个线程控制类。
+            // 类功能描述为： Represents an object that schedules units of work on the current thread.
+            // ScheduleRequired 的描述为： Gets a value that indicates whether the caller must call a Schedule method.
+            // Then what is Schedule method? Answer： 调度程序。
+            // 但是最终都会调用Producer类中的 Run（） 方法。
             if (CurrentThreadScheduler.Instance.ScheduleRequired)
             {
+                //如果需要调用Schedule()方法则调用  Description: Schedules an action to be executed after dueTime.
                 CurrentThreadScheduler.Instance.Schedule(this, (_, me) => subscription.Disposable = me.Run(observer, subscription, s => sink.Disposable = s));
             }
             else
@@ -38,6 +43,8 @@ namespace System.Reactive
                 subscription.Disposable = this.Run(observer, subscription, s => sink.Disposable = s);
             }
 
+            // CompositeDisposable类的作用是释放资源，该类的解释为：
+            // Initializes a new instance of the class with the specified number of disposables.
             return new CompositeDisposable(2) { sink, subscription };
         }
 
