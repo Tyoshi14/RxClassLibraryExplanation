@@ -39,6 +39,7 @@ namespace System.Reactive
                 CurrentThreadScheduler.Instance.Schedule(this, (_, me) => subscription.Disposable = me.Run(observer, subscription, s => sink.Disposable = s));
             }
             else
+            //比较一下有和没有Scheduler的区别。解释一下上面那个me是什么对象。
             {
                 subscription.Disposable = this.Run(observer, subscription, s => sink.Disposable = s);
             }
