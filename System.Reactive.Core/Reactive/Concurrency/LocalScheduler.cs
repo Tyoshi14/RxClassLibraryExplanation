@@ -29,7 +29,8 @@ namespace System.Reactive.Concurrency
         {
             if (action == null)
                 throw new ArgumentNullException("action");
-
+        // TimeSpan是一个系统类，该类的描述为： Represents a time interval.
+        //TimeSpan.Zero represents the zero System.TimeSpan value. This field is read-only.代表O延迟。
             return Schedule(state, TimeSpan.Zero, action);
         }
 

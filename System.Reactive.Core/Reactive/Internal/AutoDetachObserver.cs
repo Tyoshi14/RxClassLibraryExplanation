@@ -4,6 +4,11 @@ using System.Reactive.Disposables;
 
 namespace System.Reactive
 {
+    //  AutoDetachObserver继承 ObserverBase类。
+    //ObserverBase类描述： Abstract base class for implementations of the IObserver&lt;T&gt; interface.
+    //This base class enforces the grammar of observers where OnError and OnCompleted are terminal messages. 即处于non-stopped state
+    // AutoDetachObserver 类本身是一个Non-stopped Observer类，同时包含一个Observer类对象，可以实现两个Observer对象的叠加。
+    //   ---By Tyoshi
     class AutoDetachObserver<T> : ObserverBase<T>
     {
         private readonly IObserver<T> observer;

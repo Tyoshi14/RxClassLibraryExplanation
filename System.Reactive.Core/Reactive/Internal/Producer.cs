@@ -40,6 +40,7 @@ namespace System.Reactive
 
         public IDisposable SubscribeRaw(IObserver<TSource> observer, bool enableSafeguard)
         {
+        // 封装了一个名为 State 的结构体，和命名空间Linq下的的Producer类似，其实现原理是一样的。
             var state = new State();
             state.observer = observer;
             state.sink = new SingleAssignmentDisposable();

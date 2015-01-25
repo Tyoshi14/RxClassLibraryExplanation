@@ -32,14 +32,19 @@ namespace System.Reactive
             // 类功能描述为： Represents an object that schedules units of work on the current thread.
             // ScheduleRequired 的描述为： Gets a value that indicates whether the caller must call a Schedule method.
             // Then what is Schedule method? Answer： 调度程序。
-            // 但是最终都会调用Producer类中的 Run（） 方法。
+            // Run()函数订阅Producer对象分为两个分支，一个利用调度函数调度，另外一个是直接调度。二者的区别在于调度函数使得订阅函数Run()在dueTime之后执行。
             if (CurrentThreadScheduler.Instance.ScheduleRequired)
             {
-                //如果需要调用Schedule()方法则调用  Description: Schedules an action to be executed after dueTime.
+            //调度函数调用Run()订阅Producer对象。  Description: Schedules an action to be executed after dueTime.
+            //dueTime 在执行过程中为被定义为SpanTime.Zero,即为0延迟。
+            //lambda expression (_, me) => 中 _ 是一个常用方法，代表一个输入参数，但是没有特意命名。
+            // me是一个Producer类型的对象，只是一个变量。  
+            // ----By  Tyoshi
                 CurrentThreadScheduler.Instance.Schedule(this, (_, me) => subscription.Disposable = me.Run(observer, subscription, s => sink.Disposable = s));
             }
             else
-            //比较一下有和没有Scheduler的区别。解释一下上面那个me是什么对象。
+            //比较一下有和没有Scheduler的区别。解释一下上面那个me是什么对象。---By Dr.Zhang
+            // 直接订阅Producer对象，没有延迟，不需调度。 
             {
                 subscription.Disposable = this.Run(observer, subscription, s => sink.Disposable = s);
             }

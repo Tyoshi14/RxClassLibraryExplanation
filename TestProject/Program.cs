@@ -45,11 +45,18 @@ namespace TestProject
                             () => Console.WriteLine("Observer 2: OnCompleted"));
 
             Console.WriteLine("Press any key to unsubscribe");
-            Console.ReadLine();
             subscription1.Dispose();
             subscription2.Dispose();
 
 
+       // To test observable.aggregate
+            var sumOfNumbers = Observable.Range(1, 10)
+                   .Aggregate(0, (x, y) => x + y, (x) => x-30).FirstOrDefault();
+
+            var sumOfNumbers2 = Observable.Range(1, 20)
+                  .Aggregate(0, (x, y) => x + y, (x) => x+55).FirstOrDefault();
+
+            Console.WriteLine("Sum of numbers  are  {0} and {1}", sumOfNumbers, sumOfNumbers2);
             Console.ReadLine();
 
         }

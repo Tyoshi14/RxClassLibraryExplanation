@@ -311,7 +311,8 @@ namespace System
             //
             // The following types are white-listed and should not exhibit exceptional behavior
             // for regular operation circumstances.
-            //
+            // 出现一个新的类定义 ObservableBase<T>, 类描述：  Abstract base class for implementations of the IObservable&lt;T&gt; interface.
+            // if 语句判断 source 资源是不是 ObservableBase类及其继承类的实体。如果真则直接调用sourc资源的Subscible()方法。
             if (source is ObservableBase<T>)
                 return source.Subscribe(observer);
 
@@ -321,6 +322,7 @@ namespace System
                 return producer.SubscribeRaw(observer, false);
 #endif
 
+            // 非ObservableBase<T> 实体，则定义一个空Disposable对象，并且进行订阅。
             var d = Disposable.Empty;
 
             try

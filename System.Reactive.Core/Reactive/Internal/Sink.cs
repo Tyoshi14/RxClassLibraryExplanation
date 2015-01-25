@@ -12,6 +12,8 @@ namespace System.Reactive
     /// <remarks>Implementations of sinks are responsible to enforce the message grammar on the associated observer. Upon sending a terminal message, a pairing Dispose call should be made to trigger cancellation of related resources and to mute the outgoing observer.</remarks>
     internal abstract class Sink<TSource> : IDisposable
     {
+       // key words volatile:
+       // The point of volatile is that multiple threads running on multiple CPU's can and will cache data and re-order instructions.
         protected internal volatile IObserver<TSource> _observer;
         private IDisposable _cancel;
 
@@ -33,7 +35,7 @@ namespace System.Reactive
         }
 
     // 返回一个观察着对象，观察对象里面封装了对IObserver接口的重载。
-    // 不明白为什么要新建一个类 _ 来实现_observer 的三个功能。
+    // 不明白为什么要新建一个类 _ 来调用_observer 的三个功能。
         public IObserver<TSource> GetForwarder()
         {
             return new _(this);
