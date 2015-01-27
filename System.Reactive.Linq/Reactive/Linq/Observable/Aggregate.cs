@@ -95,6 +95,10 @@ namespace System.Reactive.Linq.ObservableImpl
                 // virtual和abstract是不同的，C#的精妙之处。
                 //virtual是已经实现可以override的
                 //abstract是未实现的必须override的
+                //建议仔细阅读
+                //https://msdn.microsoft.com/en-us/library/ms173152.aspx
+                //https://msdn.microsoft.com/en-us/library/6fawty39.aspx
+                //https://msdn.microsoft.com/en-us/library/ms173153.aspx
                 base.Dispose();
             }
         }
