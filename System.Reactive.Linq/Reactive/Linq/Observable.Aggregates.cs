@@ -34,6 +34,8 @@ namespace System.Reactive.Linq
             // 寻找 Aggregate（） 方法的实现。
             // s_impl.Aggregate（）返回的是一个 Aggregate<TSource, TAccumulate, TResult> 对象，但是上面的注释说的是返回 【a single element with the final accumulator value】，为什么？
             // 难道是没有理解到位吗？？？？？这个还需要考虑的问题。   ----By Tyoshi
+            //Aggregate返回值类型是IObservable, Aggregate中的是generic参数类型。
+           
             return s_impl.Aggregate<TSource, TAccumulate>(source, seed, accumulator);
         }
 

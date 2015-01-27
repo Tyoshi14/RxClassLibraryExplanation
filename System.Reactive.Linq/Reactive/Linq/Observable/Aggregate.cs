@@ -34,7 +34,7 @@ namespace System.Reactive.Linq.ObservableImpl
             setSink(sink);
         // 调用 ObservableExtensions 类中的SubscribeSafe() 方法, 订阅一个资源。
        //ObservableExtensions provides a set of static methods for subscribing delegates to observables.
-            // subscribesafe的描述：  Subscribes to the specified source, re-routing synchronous exceptions during invocation of the Subscribe method to the observer's OnError channel.
+       // subscribesafe的描述：  Subscribes to the specified source, re-routing synchronous exceptions during invocation of the Subscribe method to the observer's OnError channel.
             return _source.SubscribeSafe(sink);
         }
 
@@ -91,6 +91,8 @@ namespace System.Reactive.Linq.ObservableImpl
                 // 调用基类sink的 onNext() OnCompleted() 方法。
                 base._observer.OnNext(result);
                 base._observer.OnCompleted();
+                //  base.Dispose() s是一个 virtual 函数类型，为什么可以调用呢？？
+                // virtual和abstract是不同的，C#的精妙之处。
                 base.Dispose();
             }
         }
