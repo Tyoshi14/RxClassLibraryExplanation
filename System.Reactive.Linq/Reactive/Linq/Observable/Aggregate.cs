@@ -93,6 +93,8 @@ namespace System.Reactive.Linq.ObservableImpl
                 base._observer.OnCompleted();
                 //  base.Dispose() s是一个 virtual 函数类型，为什么可以调用呢？？
                 // virtual和abstract是不同的，C#的精妙之处。
+                //virtual是已经实现可以override的
+                //abstract是未实现的必须override的
                 base.Dispose();
             }
         }
