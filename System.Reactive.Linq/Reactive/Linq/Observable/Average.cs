@@ -5,8 +5,14 @@ using System;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
-//终于到真实的实现了，激动人心
-//先简单浏览一下这个类，毕竟只有几行
+  
+    /// <summary> Need  to  finish!
+    /// 张老师提出的关于 Aveage 实现的需要改进的地方： 
+    ///上面的平均数只有在数据完结后才给出结果
+    ///移动平均在首次填满移动窗口后就要开始输出结果了
+    //因此需要把里程碑1所要求的多个文件中涉及到的方法进行分析寻找灵感
+    /// </summary>
+
     class AverageDouble : Producer<double>
     {
         private readonly IObservable<double> _source;
@@ -23,6 +29,7 @@ namespace System.Reactive.Linq.ObservableImpl
 //第三步看下面的第一行和第三行可以发现
 //这个相当于return _source.SubscribeSafe(new _(observer, cancel))
 //含义上就是用神秘下划线对象桥接了数据源_source和数据用户的用户observer
+//                     note： 张老师的专业说法，值得学习！ 我在 All 类底层实现中添加了自己对这一过程的代码调用的理解。
             var sink = new _(observer, cancel);
             setSink(sink);
             return _source.SubscribeSafe(sink);
@@ -81,9 +88,6 @@ namespace System.Reactive.Linq.ObservableImpl
         }
     }
 //第七步对于double的Average实现看完
-//第八步发现一个问题，上面的平均数只有在数据完结后才给出结果
-//移动平均在首次填满移动窗口后就要开始输出结果了
-//因此需要把里程碑1所要求的多个文件中涉及到的方法进行分析寻找灵感
 
     class AverageSingle : Producer<float>
     {
@@ -103,6 +107,8 @@ namespace System.Reactive.Linq.ObservableImpl
 
         class _ : Sink<float>, IObserver<float>
         {
+            // 关于C# 的数据类型，请参考下面的网址。
+            // http://www.tutorialspoint.com/csharp/csharp_data_types.htm 
             private double _sum; // NOTE: Uses a different accumulator type (double), conform LINQ to Objects.
             private long _count;
 
@@ -117,6 +123,8 @@ namespace System.Reactive.Linq.ObservableImpl
             {
                 try
                 {
+                //Key words:
+                //The checked keyword is used to explicitly enable overflow checking for integral-type arithmetic operations and conversions.
                     checked
                     {
                         _sum += value;
@@ -153,6 +161,7 @@ namespace System.Reactive.Linq.ObservableImpl
         }
     }
 
+ // decimal 数据类型的 Average（） 函数实现。
     class AverageDecimal : Producer<decimal>
     {
         private readonly IObservable<decimal> _source;
@@ -221,6 +230,7 @@ namespace System.Reactive.Linq.ObservableImpl
         }
     }
 
+// AverageInt32 与 AverageInt64 实现一致。
     class AverageInt32 : Producer<double>
     {
         private readonly IObservable<int> _source;
@@ -373,6 +383,8 @@ namespace System.Reactive.Linq.ObservableImpl
             return _source.SubscribeSafe(sink);
         }
 
+ //新类型 double? 代表什么？
+// 表示观察序列包含的元素为double 或者 null. 
         class _ : Sink<double?>, IObserver<double?>
         {
             private double _sum;
@@ -389,6 +401,7 @@ namespace System.Reactive.Linq.ObservableImpl
             {
                 try
                 {
+                    // 这里可以看出，结果的计算只包含非空的变量。 
                     checked
                     {
                         if (value != null)

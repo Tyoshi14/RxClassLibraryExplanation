@@ -51,7 +51,7 @@ namespace TestProject
 
        // To test observable.aggregate
             var sumOfNumbers = Observable.Range(1, 10)
-                   .Aggregate(0, (x, y) => x + y, (x) => x-30).FirstOrDefault();
+                   .Aggregate(2, (x, y) => x + y, (x) => x-30).FirstOrDefault();
 
             var sumOfNumbers2 = Observable.Range(1, 20)
                   .Aggregate(0, (x, y) => x + y, (x) => x+55).FirstOrDefault();

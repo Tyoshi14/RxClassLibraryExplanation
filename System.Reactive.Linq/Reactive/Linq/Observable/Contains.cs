@@ -10,6 +10,7 @@ namespace System.Reactive.Linq.ObservableImpl
     {
         private readonly IObservable<TSource> _source;
         private readonly TSource _value;
+        // IEqualityComparer 接口,接口描述为 Defines methods to support the comparison of objects for equality.
         private readonly IEqualityComparer<TSource> _comparer;
 
         public Contains(IObservable<TSource> source, TSource value, IEqualityComparer<TSource> comparer)
@@ -38,9 +39,11 @@ namespace System.Reactive.Linq.ObservableImpl
 
             public void OnNext(TSource value)
             {
+                // guard
                 var res = false;
                 try
                 {
+                // 判断观察序列中是否包含指定的值。
                     res = _parent._comparer.Equals(value, _parent._value);
                 }
                 catch (Exception ex)
@@ -49,7 +52,7 @@ namespace System.Reactive.Linq.ObservableImpl
                     base.Dispose();
                     return;
                 }
-
+                // guard==true.  赋值Observer为True. 结束观察。
                 if (res)
                 {
                     base._observer.OnNext(true);

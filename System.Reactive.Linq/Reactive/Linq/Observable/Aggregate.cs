@@ -9,6 +9,20 @@ namespace System.Reactive.Linq.ObservableImpl
     // Producer 类定义在两个不同的地方，但是实现方法和原理是类似的。
     //Producer类的描述为：Base class for implementation of query operators, providing performance benefits over the use of Observable.Create。
     // Producer类只包含两个方法 IDisposable Subscribe() 和 abstract IDisposable Run() .
+    /// <Conclusion>
+    /// 总结Aggregate部分的实现原理。
+    /// 首先，Aggregates实现是IObservable接口对象，故其能够实现对IObservable方法的扩展。
+    ///      继承Producer（实现IObservable接口），实现了观察序列的基本功能 Subscribe.
+    /// 其次，重载 Producer对象的扩展功能 Run，该函数是 Aggregate 的核心函数。其实现思路为：
+    ///      定义了一个内部类 _ ,该类继承Sink 类。
+    ///          Sink 类 为一个 包含 IObserver接口对象的 IDisposable 对象，实现了释放 Observer 对象的作用。
+    ///      内部类 _ 实现 IObserver 接口，同时包含了 Aggregates 对象。故可调用 Aggregates 对象中 IObserver 类型的成员变量。
+    ///         IObserver 接口 通过调用 Aggregates 对象IObserver 成员变量的相应接口实现方法方法实现。
+    ///      函数式编程允许将函数作为参数，在另一个函数中调用。 Action<T> 可以表达为 Option<T>->(), 可将对象转换为一个delegate.
+    /// 最后，通过  IObservable 的 Subscrible（IObserver） 方法 实现 资源的订阅。
+    /// Aggregates 不仅仅是一个 IObservable类型的对象， 同时它集合了 IObserver 接口的功能，在实现订阅资源的基础上，融入了特定的方法。
+    ///                                                                                                         ---By Tyoshi
+    /// </Couclusion>
     class Aggregate<TSource, TAccumulate, TResult> : Producer<TResult>
     {
         private readonly IObservable<TSource> _source;
@@ -26,11 +40,14 @@ namespace System.Reactive.Linq.ObservableImpl
         }
 
      
-        ///  每个Producer实现类都必须重载的函数
+        ///  每个Producer实现类都必须重载的函数， 首先解释三个参数的含义.
+        ///  observer :  观察者
+        ///  IDisposable cancel ：Run（）函数的返回对象，用来释放资源。 
+        ///  Action<IDisposable> setSink : 提供回调方法，使得订阅者获得缓冲池内的对象，进而可以实现结束进程的作用。
         protected override IDisposable Run(IObserver<TResult> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
             var sink = new _(this, observer, cancel);
-        // 封装 _ 对象为一个方法。
+        // 封装 _ 对象, 使对象变成一个delegate的代理方法。
             setSink(sink);
         // 调用 ObservableExtensions 类中的SubscribeSafe() 方法, 订阅一个资源。
        //ObservableExtensions provides a set of static methods for subscribing delegates to observables.
@@ -38,7 +55,7 @@ namespace System.Reactive.Linq.ObservableImpl
             return _source.SubscribeSafe(sink);
         }
 
-        // _ 为 Aggregate<TSource, TAccumulate, TResult> 的内部类,继承Sink类和IObserver接口。完成？？？功能。
+        // _ 为 Aggregate<TSource, TAccumulate, TResult> 的内部类,继承Sink类和IObserver接口。同时实现 IObserver和　mute the outgoing observer的功能。 
         // Sink类功能： Base class for implementation of query operators, providing a lightweight sink that can be disposed to mute the outgoing observer.
         class _ : Sink<TResult>, IObserver<TSource>
         {
@@ -106,7 +123,9 @@ namespace System.Reactive.Linq.ObservableImpl
 
 
     // 两个不同的Aggregate 类，两个类之间的区别是什么？
-    // 区别一：在于泛型函数的参数个数不同。 区别二在于没有选择函数resultSelector
+    // 区别一：在于泛型函数的参数个数不同。
+    // 区别二在于没有选择函数resultSelector。
+    // 区别三，  Aggregate<TSource> 表示没有起始值 seed 传入的情况下的处理过程。
     class Aggregate<TSource> : Producer<TSource>
     {
         private readonly IObservable<TSource> _source;
@@ -129,6 +148,7 @@ namespace System.Reactive.Linq.ObservableImpl
         {
             private readonly Aggregate<TSource> _parent;
             private TSource _accumulation;
+            // 成员变量， 标志有无起始值的传入。
             private bool _hasAccumulation;
 
             public _(Aggregate<TSource> parent, IObserver<TSource> observer, IDisposable cancel)

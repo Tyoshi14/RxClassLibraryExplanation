@@ -30,6 +30,13 @@ namespace System.Reactive.Linq
 #endif
         }
 
+        //包含四个参数的 Aggregate实现，首先解释四个参数的含义。
+        // IObservable source: 需要遍历的观察序列的集合。 上一级调用函数中此变量包含this关键字，及实现了对IObservable对象方法的扩展。
+        // TAccumulate seed： 某一个起始值，应用于最后的输出结果。
+        // Func accumulator : 作用于观察序列每一个成员的函数，例如，累加器里面的累加函数。
+        // Func resultSelector : 作用于输出结果的选择函数， 实现对结果的选择与修改功能。
+        /// 另外，注意函数的返回类型是 virtual IObservable，  表明这个方法是可以被重载的。
+      
         public virtual IObservable<TResult> Aggregate<TSource, TAccumulate, TResult>(IObservable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> accumulator, Func<TAccumulate, TResult> resultSelector)
         {
 #if !NO_PERF
@@ -148,7 +155,7 @@ namespace System.Reactive.Linq
 
         #region + Average +
 
-//发现要找的Average
+//Average功能根据输入的数据类型的不同，分为多种实现模式。
 public virtual IObservable<double> Average(IObservable<double> source)
         {
 #if !NO_PERF

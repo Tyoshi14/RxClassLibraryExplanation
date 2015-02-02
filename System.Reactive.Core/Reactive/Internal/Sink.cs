@@ -23,10 +23,14 @@ namespace System.Reactive
             _cancel = cancel;
         }
 
+        // Dispose（） 函数， 完成资源释放的同时，置变量 _observer为空,_cancel=null.
         public virtual void Dispose()
         {
+            
             _observer = NopObserver<TSource>.Instance;
 
+            // Exchange()函数的含义
+            //   Sets a variable of the specified type T to a specified value and returns the original value, as an atomic operation.
             var cancel = Interlocked.Exchange(ref _cancel, null);
             if (cancel != null)
             {
