@@ -24,65 +24,77 @@ namespace System.Reactive.Linq.ObservableImpl
     /// so are many other Rx/LINQ functions
     /// Therefore, most functions we want to develop are functions like Select and Where
     /// </summary>
-    /// <typeparam name="TSource"></typeparam>
-    /// to implement functions like Select and Where we are actually implementing a class, which is of IObservable interface
-    /// note Producer is a class of IObservable interface
+    // <typeparam name="TSource"></typeparam>
+    // to implement functions like Select and Where we are actually implementing a class, which is of IObservable interface
+    // note Producer is a class of IObservable interface
     class IsEmpty<TSource> : Producer<bool>
     {
         private readonly IObservable<TSource> _source;
 
-    /// and its constructor need a parameter of the original source
+    // and its constructor need a parameter of the original source
         public IsEmpty(IObservable<TSource> source)
         {
-    /// we store the original souce as a private field
+    // we store the original souce as a private field
             _source = source;
         }
 
-    /// the Producer class defines a Run method to take care of calling chain of Subscribe
+    // the Producer class defines a Run method to take care of calling chain of Subscribe
         protected override IDisposable Run(IObserver<bool> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
-    /// the idea is simple
-    /// we create a bridging object which can talk to the real data consumer _oberserver
+    // the idea is simple
+    // we create a bridging object which can talk to the real data consumer _oberserver
             var sink = new _(observer, cancel);
             setSink(sink);
-    /// we subscribe the data source with the bridging object and return the dispose handle
+    // we subscribe the data source with the bridging object and return the dispose handle
             return _source.SubscribeSafe(sink);
         }
 
-    /// note that the bridging object must act as a data consumer which is of IObserver interface
-    /// the so Sink class is the template to bridging
+    // note that the bridging object must act as a data consumer which is of IObserver interface
+    // the so Sink class is the template to bridging
         class _ : Sink<bool>, IObserver<TSource>
         {
             public _(IObserver<bool> observer, IDisposable cancel)
                 : base(observer, cancel)
             {
+    // for functions like Sum and Count
+    // we may initialize some local variables in the constructor of the bridging object
             }
 
-    /// as an data consumer the bridging object must be able to listen to data source's OnNext calling
+    // as an data consumer the bridging object must be able to listen to data source's OnNext calling
             public void OnNext(TSource value)
             {
-    /// when the data source calls, a datum is pushed in
-    /// normally we do some work here
-    /// after knowing what to tell the real data consumer _oberserver
-    /// we call its OnNext method to transmit the processed datum
-    /// in the case since we got a datum, the source is not emtpy
+    // when the data source calls, a datum is pushed in
+    // normally we do some work here
+    // after knowing what to tell the real data consumer _oberserver
+    // we call its OnNext method to transmit the processed datum
+    // in the case since we got a datum, the source is not emtpy
+    // for functions like Select, we will always transmit a datum here
+    // for functions like Where, we may or may not transmit a datum here
+    // for functions like Sum, we will not transmit data here, we will wait the OnCompleted
                 base._observer.OnNext(false);
+    // in most cases, we will not call _observer.OnCompleted() here
+    // because most functions don't have early completion
                 base._observer.OnCompleted();
-    /// after the transmition we dispose the bridging object
+    // therefore, most functions don't need to dispose the bridging object here
+    // after the transmition we dispose the bridging object
                 base.Dispose();
             }
 
-    /// OnError is similar
+    // OnError is similar
             public void OnError(Exception error)
             {
                 base._observer.OnError(error);
                 base.Dispose();
             }
 
-    /// so is OnCompleted
+    // so is OnCompleted
             public void OnCompleted()
             {
+    // in functions like Sum, we need to transmit here
+    // in functions like Average, we need some final computation before transmit
+    // in functions like Select, we have nothing to do here
                 base._observer.OnNext(true);
+    // the following are good for most cases
                 base._observer.OnCompleted();
                 base.Dispose();
             }
