@@ -21,6 +21,7 @@ namespace System.Reactive.Linq.ObservableImpl
             _predicate = predicate;
         }
 
+        // Observable.Count()底层实现。 Count() 实现分为两种情况，一是计数观察序列元素的个数。二是计数符合 predicate 条件的元素个数。
         protected override IDisposable Run(IObserver<int> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
             if (_predicate == null)
@@ -37,6 +38,7 @@ namespace System.Reactive.Linq.ObservableImpl
             }
         }
 
+        // 直接计数元素个数分支。
         class _ : Sink<int>, IObserver<TSource>
         {
             private int _count;
@@ -77,6 +79,7 @@ namespace System.Reactive.Linq.ObservableImpl
             }
         }
 
+        // 符合 predicate条件的Count分支。
         class CountImpl : Sink<int>, IObserver<TSource>
         {
             private readonly Count<TSource> _parent;

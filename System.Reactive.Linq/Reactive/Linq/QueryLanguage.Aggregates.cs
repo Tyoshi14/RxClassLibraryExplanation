@@ -690,6 +690,8 @@ public virtual IObservable<double> Average(IObservable<double> source)
 
         public virtual IObservable<TResult> Max<TSource, TResult>(IObservable<TSource> source, Func<TSource, TResult> selector)
         {
+            // Select（source，selector） 返回source中所有selector选择出的元素。
+            // Select 以后会解释其具体实现。
             return Max(Select(source, selector));
         }
 

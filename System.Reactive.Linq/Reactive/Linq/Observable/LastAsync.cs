@@ -5,6 +5,12 @@ using System;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Observable.LastAsync()底层实现。分为两种情况，一是直接返回观察序列的最后一个元素；二是，返回观察序列符合predicate条件的最后一个元素。 
+    /// 同时也考虑了未找到指定元素，是否抛出异常或者返回默认值的处理。
+    /// </summary>
+    /// LastAsync 内部类实现过程中增加了标记变量 _seenValue 来标记是不是含有元素，省去了判空的过程。逻辑上更加严谨。
+    /// <typeparam name="TSource"></typeparam>
     class LastAsync<TSource> : Producer<TSource>
     {
         private readonly IObservable<TSource> _source;
@@ -34,10 +40,12 @@ namespace System.Reactive.Linq.ObservableImpl
             }
         }
 
+        // 直接返回观察序列的最后一个元素
         class _ : Sink<TSource>, IObserver<TSource>
         {
             private readonly LastAsync<TSource> _parent;
             private TSource _value;
+            // guard 用来标记观察序列是否为空。
             private bool _seenValue;
 
             public _(LastAsync<TSource> parent, IObserver<TSource> observer, IDisposable cancel)
@@ -77,10 +85,12 @@ namespace System.Reactive.Linq.ObservableImpl
             }
         }
 
+        //返回观察序列符合predicate条件的最后一个元素
         class LastAsyncImpl : Sink<TSource>, IObserver<TSource>
         {
             private readonly LastAsync<TSource> _parent;
             private TSource _value;
+            // guard 用于标记是不是很有 predicate 条件的元素。
             private bool _seenValue;
 
             public LastAsyncImpl(LastAsync<TSource> parent, IObserver<TSource> observer, IDisposable cancel)

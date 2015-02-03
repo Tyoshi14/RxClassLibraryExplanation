@@ -4,7 +4,11 @@
 using System;
 
 namespace System.Reactive.Linq.ObservableImpl
-{
+{   
+    /// <summary>
+    /// Observable.IsEmpty() 的底层实现，用于判断观察序列是否为空。
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
     class IsEmpty<TSource> : Producer<bool>
     {
         private readonly IObservable<TSource> _source;

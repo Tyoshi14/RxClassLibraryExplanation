@@ -41,6 +41,7 @@ namespace System.Reactive.Linq.ObservableImpl
             {
                 if (_i == 0)
                 {
+                    // 定位到指定的位置后，返回所在位置的元素，并且结束观察。
                     base._observer.OnNext(value);
                     base._observer.OnCompleted();
                     base.Dispose();
@@ -57,6 +58,7 @@ namespace System.Reactive.Linq.ObservableImpl
 
             public void OnCompleted()
             {
+                // flag _throwOnEmpty 控制Index越界是否抛出异常。若不抛出异常，返回TSource默认值default(TSource)。
                 if (_parent._throwOnEmpty)
                 {
                     base._observer.OnError(new ArgumentOutOfRangeException("index"));

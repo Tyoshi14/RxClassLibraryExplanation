@@ -5,6 +5,12 @@ using System;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Observable.LongCount() 底层实现。分种情况计数观察序列元素的个数，计数所有元素个数，计数符合 predicate  条件元素个数。
+    /// </summary>
+    /// 由代码的流程可以看出，计数结果只有在观察序列遍历完成之后才能返回。
+    /// 思考在分之二里，是不是可以通过一个平移窗口，分时段返回符合predicate 条件的元素个数。
+    /// <typeparam name="TSource"></typeparam>
     class LongCount<TSource> : Producer<long>
     {
         private readonly IObservable<TSource> _source;

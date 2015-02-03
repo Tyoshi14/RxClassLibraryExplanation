@@ -6,6 +6,10 @@ using System.Collections.Generic;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+   /// <summary>
+    /// Observable.Max()底层实现。根据观察序列　元素的类型　以及是否应用　comparer　分为不同的实现。
+   /// </summary>
+   /// <typeparam name="TSource"></typeparam>
     class Max<TSource> : Producer<TSource>
     {
         private readonly IObservable<TSource> _source;
@@ -20,6 +24,8 @@ namespace System.Reactive.Linq.ObservableImpl
         protected override IDisposable Run(IObserver<TSource> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
             // LINQ to Objects makes this distinction in order to make [Max|Max] of an empty collection of reference type objects equal to null.
+            // The reason： Max(Select(source, selector), comparer) 中应用 LINQ 会返回 empty collection of reference type objects
+            // 相对应的实现 观察序列与 观察者 桥接的过程，也是不同的。 
             if (default(TSource) == null)
             {
                 var sink = new _(this, observer, cancel);
@@ -37,7 +43,7 @@ namespace System.Reactive.Linq.ObservableImpl
         class Delta : Sink<TSource>, IObserver<TSource>
         {
             private readonly Max<TSource> _parent;
-            private bool _hasValue;
+            private bool _hasValue;   //  guard 用于 标记  _lastValue是否含有值。
             private TSource _lastValue;
 
             public Delta(Max<TSource> parent, IObserver<TSource> observer, IDisposable cancel)
@@ -100,6 +106,7 @@ namespace System.Reactive.Linq.ObservableImpl
             }
         }
 
+        // 
         class _ : Sink<TSource>, IObserver<TSource>
         {
             private readonly Max<TSource> _parent;
@@ -112,9 +119,10 @@ namespace System.Reactive.Linq.ObservableImpl
 
                 _lastValue = default(TSource);
             }
-
+         
             public void OnNext(TSource value)
             {
+                // 由于 LINQ 中 空元素的原因，需要对每一个元素进行盼空操作。
                 if (value != null)
                 {
                     if (_lastValue == null)
@@ -191,6 +199,8 @@ namespace System.Reactive.Linq.ObservableImpl
             {
                 if (_hasValue)
                 {
+                    // Returns a value indicating whether the specified number evaluates to a value
+                    //     that is not a number (System.Double.NaN).
                     if (value > _lastValue || double.IsNaN(value))
                     {
                         _lastValue = value;
@@ -522,6 +532,7 @@ namespace System.Reactive.Linq.ObservableImpl
 
             public void OnNext(double? value)
             {
+                // 判断 该元素是不是为空。
                 if (!value.HasValue)
                     return;
 
