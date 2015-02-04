@@ -975,6 +975,8 @@ public virtual IObservable<double> Average(IObservable<double> source)
         public virtual IObservable<bool> SequenceEqual<TSource>(IObservable<TSource> first, IObservable<TSource> second)
         {
 #if !NO_PERF
+            // An interface EqualityComparer. Its explanation is that
+            // Returns a default equality comparer for the type specified by the generic  argument.
             return new SequenceEqual<TSource>(first, second, EqualityComparer<TSource>.Default);
 #else
             return first.SequenceEqual(second, EqualityComparer<TSource>.Default);

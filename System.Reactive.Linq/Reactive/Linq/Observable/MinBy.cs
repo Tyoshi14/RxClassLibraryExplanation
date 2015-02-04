@@ -6,6 +6,13 @@ using System.Collections.Generic;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Min branch of Class Observable.
+    /// Similiar with the MaxBy Class. For more details,please see the explanation of MaxBy.
+    /// This time I want to talk about the advantages of this kind of class.
+    /// MinBy returns a list of TSource elements in terms of another data type TKey without changing the original data.
+    /// This feature is popular in Financial and other areas.
+    /// </summary>
     class MinBy<TSource, TKey> : Producer<IList<TSource>>
     {
         private readonly IObservable<TSource> _source;

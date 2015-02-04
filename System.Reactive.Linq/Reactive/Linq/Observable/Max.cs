@@ -8,6 +8,7 @@ namespace System.Reactive.Linq.ObservableImpl
 {
    /// <summary>
     /// Observable.Max()底层实现。根据观察序列　元素的类型　以及是否应用　comparer　分为不同的实现。
+    /// 
    /// </summary>
    /// <typeparam name="TSource"></typeparam>
     class Max<TSource> : Producer<TSource>

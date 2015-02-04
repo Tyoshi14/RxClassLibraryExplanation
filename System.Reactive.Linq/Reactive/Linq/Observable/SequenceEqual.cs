@@ -7,6 +7,15 @@ using System.Reactive.Disposables;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the SequenceEqual branch of Observable class.
+    /// SequenceEqual class needs to deal with 2 conditions. One is compare two observable sequences, the other is to compare a observable sequence and a enumerable sequence.
+    /// 
+    /// In the following code, we can see that the structure  is a bit different from the structures before. The diffrence lays in the function Run().
+    /// In other structures we subscribe the data in the override Run function. 
+    /// And here observer subscribes the data in the inner bridge class called _ and  SequenceEqualImpl. The Override Run function only call the inner Run function.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
     class SequenceEqual<TSource> : Producer<bool>
     {
         private readonly IObservable<TSource> _first;
@@ -30,12 +39,15 @@ namespace System.Reactive.Linq.ObservableImpl
 
         protected override IDisposable Run(IObserver<bool> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
+            // 1 branch:  _second != null means that the second sequence is an Observable sequence.
             if (_second != null)
             {
                 var sink = new _(this, observer, cancel);
                 setSink(sink);
+                // Pay attentiont to the change here.
                 return sink.Run();
             }
+            // The other is that the second sequence is an Enumerable sequence.
             else
             {
                 var sink = new SequenceEqualImpl(this, observer, cancel);
@@ -44,6 +56,69 @@ namespace System.Reactive.Linq.ObservableImpl
             }
         }
 
+        /// <summary>
+        /// We are all curious about the algorithm of comparing two observable sequences. Then see the explantions below.
+        /// 
+        /// 1. 
+        /// Initialize the paremeter.
+        ///     object _gate :  realize a mutual-exclusion lock.
+        ///     bool _donel ： indicate weather the first observable sequence reaches the end.
+        ///     Queue<TSource> _ql ： the elements of the first  observable sequence  need to be process.
+        ///     bool _doner : indicate weather the second observable sequence reaches the end.
+        ///     Queue<TSource> _qr : the elements of the second  observable sequence  need to be process.
+        ///     
+        /// 2. 
+        /// The observer of class F subscribes the first Observable sequence data. F is an observer to compare two elements from two sequences respectively.
+        ///   The OnNext procedure of F
+        ///     foreach value in First Observable sequence
+        ///      lock
+        ///         if _qr.Count >0
+        ///             v=_qr.Dequeue 
+        ///             equal=_comparer.Equals(value, v)
+        ///             if equal is false 
+        ///                 End observe, return Not Equal
+        ///        else if _doner is true
+        ///              End observe, return Not Equal
+        ///        else 
+        ///             _ql.Enqueue(value)
+        ///  
+        ///   The OnCompleted procedure of F 
+        ///      lock
+        ///         _donel=true
+        ///         if _ql.Count == 0
+        ///            if _qr.Count > 0
+        ///                End observe, return Not Equal
+        ///            else if _doner is ture
+        ///                End observe, return  Equal
+        ///                
+        /// 3.       
+        /// The observer of class S subscribes the first Observable sequence data. S is also an observer to compare two elements from two sequences respectively.
+        ///   The OnNext procedure of S
+        ///     foreach value in Second Observable sequence
+        ///      lock
+        ///         if _ql.Count >0
+        ///             v=_ql.Dequeue 
+        ///             equal=_comparer.Equals(value, v)
+        ///             if equal is false 
+        ///                 End observe, return Not Equal
+        ///        else if _donel is true
+        ///              End observe, return Not Equal
+        ///        else 
+        ///             _qr.Enqueue(value)
+        ///  
+        ///   The OnCompleted procedure of S 
+        ///      lock
+        ///         _doner=true
+        ///         if _qr.Count == 0
+        ///            if _ql.Count > 0
+        ///                End observe, return Not Equal
+        ///            else if _donel is ture
+        ///                End observe, return  Equal
+        ///   
+        /// Conclusion:
+        ///  Then we can see that the code use DataType  Queue to guarantee the order of all sequence. 
+        ///  S and F work alternatively to compare the the the values to judege the equality.
+        /// </summary>
         class _ : Sink<bool>
         {
             private readonly SequenceEqual<TSource> _parent;
@@ -86,6 +161,9 @@ namespace System.Reactive.Linq.ObservableImpl
 
                 public void OnNext(TSource value)
                 {
+                 /// Explain the key word lock
+                 /// The lock keyword marks a statement block as a critical section by obtaining the mutual-exclusion lock for
+                 /// a given objectThe lock keyword marks a statement block as a critical section by obtaining the mutual-exclusion lock for a given object
                     lock (_parent._gate)
                     {
                         if (_parent._qr.Count > 0)
@@ -226,6 +304,12 @@ namespace System.Reactive.Linq.ObservableImpl
             }
         }
 
+
+        /// <summary>
+        /// Compare an Observable sequence with an enumerable sequence.
+        /// The basic thought of this class is that call OnNext and _enumerator.Current together. 
+        /// Then return the result of the compare the result. 
+        /// </summary>
         class SequenceEqualImpl : Sink<bool>, IObserver<TSource>
         {
             private readonly SequenceEqual<TSource> _parent;

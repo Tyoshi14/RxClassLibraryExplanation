@@ -6,6 +6,13 @@ using System.Collections.Generic;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Min branch of Class Observable.
+    /// The thought of it is similiar with the Max branch.
+    /// Note that we can not see the member variable Func<TSource, TResult> selector in the class.
+    /// because another member variable _source is the return result of function Select(source, selector), seeQueryLanguage.Sequence, which already takes  selector as a parameter.
+    /// </summary>
+    
     class Min<TSource> : Producer<TSource>
     {
         private readonly IObservable<TSource> _source;
