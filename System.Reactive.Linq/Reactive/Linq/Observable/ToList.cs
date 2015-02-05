@@ -6,6 +6,12 @@ using System.Collections.Generic;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Observable ToList branch.
+    /// We can see that the code is almost the same with implement class ToArray. The only difference lays in the OnCompleted section.
+    /// When dealing with a database, we often need to convert a sequence to a List or a Array not only for convenient calculation, 
+    /// but also for other operation like interation and so on.
+    /// </summary>
     class ToList<TSource> : Producer<IList<TSource>>
     {
         private readonly IObservable<TSource> _source;
@@ -45,6 +51,7 @@ namespace System.Reactive.Linq.ObservableImpl
 
             public void OnCompleted()
             {
+                // The  difference with ToArray.  _list doesn't need to convert to array.
                 base._observer.OnNext(_list);
                 base._observer.OnCompleted();
                 base.Dispose();

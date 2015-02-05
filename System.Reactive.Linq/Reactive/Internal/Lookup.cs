@@ -6,12 +6,16 @@ using System.Linq;
 
 namespace System.Reactive
 {
+    /// ILookup is a interface. Definition is as follows.
+    /// Defines an indexer, size property, and Boolean search method for data structures
+    /// that map keys to System.Collections.Generic.IEnumerable<T> sequences of values.
     class Lookup<K, E> : ILookup<K, E>
     {
         Dictionary<K, List<E>> d;
 
         public Lookup(IEqualityComparer<K> comparer)
         {
+         // The parameter comparer uses when comparing keys.
             d = new Dictionary<K, List<E>>(comparer);
         }
 

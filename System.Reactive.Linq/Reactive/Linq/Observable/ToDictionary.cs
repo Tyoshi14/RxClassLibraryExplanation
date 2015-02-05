@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Observable ToDictionary branch.
+    /// </summary>
     class ToDictionary<TSource, TKey, TElement> : Producer<IDictionary<TKey, TElement>>
     {
         private readonly IObservable<TSource> _source;
@@ -31,12 +34,16 @@ namespace System.Reactive.Linq.ObservableImpl
         class _ : Sink<IDictionary<TKey, TElement>>, IObserver<TSource>
         {
             private readonly ToDictionary<TSource, TKey, TElement> _parent;
+            //Dictionary is a new data type.
+            // Represents a collection of keys and values.
             private Dictionary<TKey, TElement> _dictionary;
 
             public _(ToDictionary<TSource, TKey, TElement> parent, IObserver<IDictionary<TKey, TElement>> observer, IDisposable cancel)
                 : base(observer, cancel)
             {
                 _parent = parent;
+            // call the Dictionary constructor with a IEqualityComparer parameter.
+            // Initialize an empty instance of System.Collections.Generic.Dictionary, and use the specified IEqualityComparer _comparer.
                 _dictionary = new Dictionary<TKey, TElement>(_parent._comparer);
             }
 
@@ -44,6 +51,12 @@ namespace System.Reactive.Linq.ObservableImpl
             {
                 try
                 {
+                    // call Dictionary.Add(key,value) function to add a new element to _dictionary.
+                    // _keySelector is a function that convert a TSource data to a TKey type.
+                    // _elementSelector is also a function which convert a TSource data to a TKey type.
+                    // Watch  out！ Add  doesn't let to add a value a key already eixsts.
+                    // System.ArgumentException: 
+                    //           An element with the same key already exists in the System.Collections.Generic.Dictionary<TKey,TValue>.
                     _dictionary.Add(_parent._keySelector(value), _parent._elementSelector(value));
                 }
                 catch (Exception ex)

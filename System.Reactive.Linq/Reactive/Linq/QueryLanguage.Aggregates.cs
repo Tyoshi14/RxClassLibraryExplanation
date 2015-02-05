@@ -1449,6 +1449,7 @@ public virtual IObservable<double> Average(IObservable<double> source)
         public virtual IObservable<IDictionary<TKey, TElement>> ToDictionary<TSource, TKey, TElement>(IObservable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
         {
 #if !NO_PERF
+            // The forth parameter EqualityComparer<TKey>.Default indicates that this function use the default EqualityComparer.
             return new ToDictionary<TSource, TKey, TElement>(source, keySelector, elementSelector, EqualityComparer<TKey>.Default);
 #else
             return source.ToDictionary(keySelector, elementSelector, EqualityComparer<TKey>.Default);
@@ -1458,6 +1459,7 @@ public virtual IObservable<double> Average(IObservable<double> source)
         public virtual IObservable<IDictionary<TKey, TSource>> ToDictionary<TSource, TKey>(IObservable<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
         {
 #if !NO_PERF
+            // The third parameter is a lambda expression which means the input x remain the same.
             return new ToDictionary<TSource, TKey, TSource>(source, keySelector, x => x, comparer);
 #else
             return source.ToDictionary(keySelector, x => x, comparer);

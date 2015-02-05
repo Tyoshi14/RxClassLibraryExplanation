@@ -5,6 +5,12 @@ using System;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Observable SingleAsync branch.
+    /// It checks weather the sequence has only one element that satisfies a  certain condietion.
+    /// I wonder weather this function has pratical applications in some area?
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
     class SingleAsync<TSource> : Producer<TSource>
     {
         private readonly IObservable<TSource> _source;
@@ -38,7 +44,8 @@ namespace System.Reactive.Linq.ObservableImpl
         {
             private readonly SingleAsync<TSource> _parent;
             private TSource _value;
-            private bool _seenValue;
+            //_seenValue is a parameter that guarantees only one element in the sequence.
+            private bool _seenValue; 
 
             public _(SingleAsync<TSource> parent, IObserver<TSource> observer, IDisposable cancel)
                 : base(observer, cancel)
@@ -68,6 +75,10 @@ namespace System.Reactive.Linq.ObservableImpl
                 base.Dispose();
             }
 
+            // The function is called only when the observalbe sequence is completed.
+            // In this function we have 2 conditions.
+            // Throw empty error only when the sequence is empty and we allow the empty error.
+            // In the other case return the RSource default value.
             public void OnCompleted()
             {
                 if (!_seenValue && _parent._throwOnEmpty)
@@ -99,6 +110,7 @@ namespace System.Reactive.Linq.ObservableImpl
                 _seenValue = false;
             }
 
+            // The code do a lot of work in OnNext. 
             public void OnNext(TSource value)
             {
                 var b = false;

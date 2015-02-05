@@ -6,6 +6,10 @@ using System.Collections.Generic;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Observable ToArray branch.
+    /// In some cases we need to convert List to Array. Array in a data type with a fixed size, however, List is random length.
+    /// </summary>
     class ToArray<TSource> : Producer<TSource[]>
     {
         private readonly IObservable<TSource> _source;
@@ -45,6 +49,7 @@ namespace System.Reactive.Linq.ObservableImpl
 
             public void OnCompleted()
             {
+                // In C#, we can convert a list to a array by using the function ToArray.
                 base._observer.OnNext(_list.ToArray());
                 base._observer.OnCompleted();
                 base.Dispose();

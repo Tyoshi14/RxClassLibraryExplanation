@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace System.Reactive.Linq.ObservableImpl
 {
     /// <summary>
-    /// Base implement class of the branch MaxBy of Observable class. 
+    /// Base implement class of the MaxBy branch of Observable class. 
     /// In this class we get a list of TSource elements with the max value of TKey type in terms of  Func<> and IComparer<>.
     /// </summary>
     class MaxBy<TSource, TKey> : Producer<IList<TSource>>

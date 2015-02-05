@@ -5,6 +5,10 @@ using System;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Observable Sum branch.
+    /// Similar with the code structure of Max,Min,MaxBy and so on. Sum is divided into many subbranches according to numeric data type.
+    /// </summary>
     class SumDouble : Producer<double>
     {
         private readonly IObservable<double> _source;
