@@ -25,7 +25,7 @@ namespace System.Reactive.Threading.Tasks
         {
             if (task == null)
                 throw new ArgumentNullException("task");
-
+            // AsyncSubject<Unit>： Represents the result of an asynchronous operation.
             var subject = new AsyncSubject<Unit>();
 
             if (task.IsCompleted)

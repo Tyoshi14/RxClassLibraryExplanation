@@ -49,17 +49,53 @@ namespace TestProject
             subscription2.Dispose();
 
 
-       // To test observable.aggregate
+       // To test observable.Range
+       // testObservableRange();
+
+       // To test Observable.Create()
+       //    testObservableCreate();
+
+          
+            Console.WriteLine(Observable.Range(1, 19).Sum().FirstOrDefault());
+            Console.WriteLine(Observable.Range(1, 10).Sum().FirstAsync());
+            Console.WriteLine(Observable.Range(1, 20).Sum().FirstOrDefaultAsync());
+            Console.ReadLine();
+        }
+
+
+        public  static void testObservableRange() {
+           
             var sumOfNumbers = Observable.Range(1, 10)
-                   .Aggregate(2, (x, y) => x + y, (x) => x-30).FirstOrDefault();
+                   .Aggregate(2, (x, y) => x + y, (x) => x - 30).FirstOrDefault();
 
             var sumOfNumbers2 = Observable.Range(1, 20)
-                  .Aggregate(0, (x, y) => x + y, (x) => x+55).FirstOrDefault();
+                  .Aggregate(0, (x, y) => x + y, (x) => x + 55).FirstOrDefault();
 
             Console.WriteLine("Sum of numbers  are  {0} and {1}", sumOfNumbers, sumOfNumbers2);
             Console.ReadLine();
 
+
         }
+
+        public static void testObservableCreate()
+        {
+            var ob = Observable.Create<string>(
+             observer =>
+             {
+                 var timer = new System.Timers.Timer();
+                 timer.Interval = 1000;
+                 timer.Elapsed += (s, e) => observer.OnNext("tick");
+                 timer.Elapsed += (s, e) => Console.WriteLine(e.SignalTime);
+                 timer.Start();
+                 return timer;
+             });
+
+            var subscription = ob.Subscribe(Console.WriteLine);
+            Console.ReadLine();
+            subscription.Dispose();
+        }
+
+        
     }
 
 

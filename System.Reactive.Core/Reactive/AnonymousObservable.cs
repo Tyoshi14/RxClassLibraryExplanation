@@ -32,6 +32,8 @@ namespace System.Reactive
         /// <returns>Disposable object representing an observer's subscription to the observable sequence.</returns>
         protected override IDisposable SubscribeCore(IObserver<T> observer)
         {
+       // The ?? operator is called the null-coalescing operator. 
+       // It returns the left-hand operand if the operand is not null; otherwise it returns the right hand operand.
             return _subscribe(observer) ?? Disposable.Empty;
         }
     }

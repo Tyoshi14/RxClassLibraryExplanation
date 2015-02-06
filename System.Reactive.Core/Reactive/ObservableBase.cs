@@ -30,7 +30,8 @@ namespace System.Reactive
             // AutoDetachObserver类是一个non-stopped的observer对象。
             var autoDetachObserver = new AutoDetachObserver<T>(observer);
             
-            // 在对资源进行订阅是，仍然分为两种情况，一种是利用调度函数调度函数执行，另一种是直接执行。 目前见到的所有Subscribe方法都是这种实现方式，需要搞清原因。
+            // 在对资源进行订阅是，仍然分为两种情况，一种是利用调度函数调度函数执行，另一种是直接执行。
+            // 目前见到的所有Subscribe方法都是这种实现方式，需要搞清原因。
             // --- Question remained by Tyoshi
             if (CurrentThreadScheduler.IsScheduleRequired)
             {
@@ -48,6 +49,7 @@ namespace System.Reactive
                 // on to invoking this work item. Too much of protection here would cause the
                 // exception thrown in OnNext to circle back to OnError, which looks like the
                 // sequence can't make up its mind.
+
                 // param1 是一个Observer类型， param2 是一个函数。返回的是 IDisposable 资源释放函数类型。
                 CurrentThreadScheduler.Instance.Schedule(autoDetachObserver, ScheduledSubscribe);
             }

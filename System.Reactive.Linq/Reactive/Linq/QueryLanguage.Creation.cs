@@ -26,11 +26,26 @@ namespace System.Reactive.Linq
             return new AnonymousObservable<TSource>(subscribe);
         }
 
+        /// <summary>
+        /// This function is correspond to the function IObservable<TResult> Create<TResult>(Func<IObserver<TResult>, Action> subscribe).
+        /// In addition, I want to say that this function shows us the use of Lambda in C#. 
+        /// Lambda is powerful and very often used in function programming.
+        /// </summary>
+        /// <typeparam name="TSource"> The return element type</typeparam>
+        /// <param name="subscribe">An delegate function which takes a IObserver object as input and a Action delegate function as output. </param>
+        /// <returns></returns>
         public virtual IObservable<TSource> Create<TSource>(Func<IObserver<TSource>, Action> subscribe)
         {
+            // The parameter  type of the constructor is Func<IObserver<T>, IDisposable>. so we should do some changes to the input parameter subscribe.
             return new AnonymousObservable<TSource>(o =>
             {
+                // As we can see Func subscribe return an Action result which should be turn into type IDisposable.
                 var a = subscribe(o);
+                /// The logic of the next line is as follows 
+                /// if a is null
+                ///     return an empty instance created by Disposable.Empty. 
+                /// else 
+                ///     return a disposable object，created by Disposable.Create(a)，that invokes the specified action when disposed. 
                 return a != null ? Disposable.Create(a) : Disposable.Empty;
             });
         }
@@ -40,16 +55,40 @@ namespace System.Reactive.Linq
         #region - CreateAsync -
 
 #if !NO_TPL
+      /// <summary>
+      /// The function of the code below is:
+      ///     Creates an observable sequence from a specified cancellable asynchronous[异步的] Subscribe method.
+      /// </summary>
+      /// <typeparam name="TResult"> The type of the element in the return sequence.</typeparam>
+      /// <param name="subscribeAsync"> A functions delegate takes 2 parameters and 1 output result.
+      ///   The first parameter is an object that implements interface IObserver.
+      ///   The second parameter is a structure named CancellationToken which propagates notification that operations should be canceled.
+      ///   The result is an instance of Task that represents an asynchronous operation.
+      /// </param>
+      /// 
         public virtual IObservable<TResult> Create<TResult>(Func<IObserver<TResult>, CancellationToken, Task> subscribeAsync)
         {
+            //call constructor AnonymousObservable(Func<IObserver<T>, IDisposable> subscribe)
+            // The parameter passed into the constructor is a lambda expression.
+            // observer is input and the codes in {} is a procedure that can produce an IDisposable output result. 
             return new AnonymousObservable<TResult>(observer =>
             {
+                // Initializes the System.Threading.CancellationTokenSource. 
                 var cancellable = new CancellationDisposable();
 
+                //  there we see a new function ToObservable() which returns an observable sequence that signals when the task completes.
+                // The second parameter means getting the <see cref="T:System.Threading.CancellationToken"/> used by this CancellationDisposable.
                 var taskObservable = subscribeAsync(observer, cancellable.Token).ToObservable();
+
+                //  constructor AnonymousObserver : Creates an observer from the specified OnNext, OnError, and OnCompleted actions.
+                //  new structure Unit
+                //      Determines whether the specified Unit values is equal to the current Unit.
                 var taskCompletionObserver = new AnonymousObserver<Unit>(Stubs<Unit>.Ignore, observer.OnError, observer.OnCompleted);
+
+                //  Subscribe:  Notifies the provider taskObservable that an observer taskCompletionObserver is to receive notifications.
                 var subscription = taskObservable.Subscribe(taskCompletionObserver);
 
+                //   Represents a group of disposable resources that are disposed together.
                 return new CompositeDisposable(cancellable, subscription);
             });
         }
