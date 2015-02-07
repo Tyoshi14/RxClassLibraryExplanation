@@ -19,6 +19,45 @@ namespace System.Reactive.Linq
 
     internal partial class QueryLanguage
     {
+        /// <summary>
+        /// After explaining all create functions, I would like say something about their realization principle and compare the difference.
+        /// 1.Realization principle
+        ///   The function of all Create is to create an observable sequence from a specified Subscribe method passed as a parameter.
+        ///   All Creates return an AnonymousObservable object. 
+        ///   
+        ///     Firstly, introduce the inheritance relationships of class AnonymousObservable used in Create.
+        ///       AnonymousObservable :  It's main functicon is to redefine subscribe method.
+        ///             v 
+        ///       ObservableBase  :  Contains an AutoDetachObserver object to observe the observable source continuously.
+        ///             v 
+        ///       IObservable  :  Defines a provider for push-based notification.
+        ///    So, AnonymousObservable can fulfilment Create function. 
+        ///    
+        /// 2.Asynchronous Create
+        ///    Base on 1, we can do a little changes to fulfilment asynchronous Create function with lambda expressions. 
+        ///    Lambda expressions is like inputs => {code block} and they can be used as parameter in function programming.
+        ///    We can put the following 4 steps into {} and redefine the input parameter of AnonymousObservable.
+        ///      First change a Task object which is necessary in asynchronous conditons to Observable 
+        ///      Then create an non-stopped Observer
+        ///      Observer subscribes Observable
+        ///      Dispose all resources
+        ///    Above all we can create asynchronous observable sequenes perfectly.
+        ///    
+        /// 3.  There are 8 different Creates in the following code, their difference lays in parameters.
+        ///     Func<IObserver<TSource>, IDisposable> subscribe
+        ///     Func<IObserver<TSource>, Action> subscribe
+        ///     
+        ///     Func<IObserver<TResult>, CancellationToken, Task> subscribeAsync
+        ///     Func<IObserver<TResult>, Task> subscribeAsync
+        ///     
+        ///     Func<IObserver<TResult>, CancellationToken, Task<IDisposable>> subscribeAsync
+        ///     Func<IObserver<TResult>, Task<IDisposable>> subscribeAsync
+        ///     
+        ///     Func<IObserver<TResult>, CancellationToken, Task<Action>> subscribeAsync
+        ///     Func<IObserver<TResult>, Task<Action>> subscribeAsync
+        ///     
+        ///     Pay attention to CancellationToken and type of Task.
+        /// </summary>
         #region - Create -
 
         public virtual IObservable<TSource> Create<TSource>(Func<IObserver<TSource>, IDisposable> subscribe)
@@ -55,6 +94,9 @@ namespace System.Reactive.Linq
         #region - CreateAsync -
 
 #if !NO_TPL
+       
+
+
       /// <summary>
       /// The function of the code below is:
       ///     Creates an observable sequence from a specified cancellable asynchronous[异步的] Subscribe method.
@@ -65,7 +107,6 @@ namespace System.Reactive.Linq
       ///   The second parameter is a structure named CancellationToken which propagates notification that operations should be canceled.
       ///   The result is an instance of Task that represents an asynchronous operation.
       /// </param>
-      /// 
         public virtual IObservable<TResult> Create<TResult>(Func<IObserver<TResult>, CancellationToken, Task> subscribeAsync)
         {
             //call constructor AnonymousObservable(Func<IObserver<T>, IDisposable> subscribe)
@@ -76,7 +117,7 @@ namespace System.Reactive.Linq
                 // Initializes the System.Threading.CancellationTokenSource. 
                 var cancellable = new CancellationDisposable();
 
-                //  there we see a new function ToObservable() which returns an observable sequence that signals when the task completes.
+                //  There we see a new function ToObservable() which returns an observable sequence that signals when the task completes.
                 // The second parameter means getting the <see cref="T:System.Threading.CancellationToken"/> used by this CancellationDisposable.
                 var taskObservable = subscribeAsync(observer, cancellable.Token).ToObservable();
 
@@ -93,20 +134,38 @@ namespace System.Reactive.Linq
             });
         }
 
+        /// <summary>
+        /// Creates an observable sequence from a specified asynchronous Subscribe method.
+        /// The basic idea of the this function is to call Create<TResult>(Func<IObserver<TResult>, CancellationToken, Task> subscribeAsync) function.
+        ///     But we leave out CancellationToken parameter.
+        /// </summary>
         public virtual IObservable<TResult> Create<TResult>(Func<IObserver<TResult>, Task> subscribeAsync)
         {
+            /// The parameter is a lambda expression which equals Func<IObserver<TResult>, CancellationToken, Task> .
+            ///     It takes IObserver observer and CancellationToken token that doesn't use as input parameters.
+            ///     The whole (observer, token) => subscribeAsync(observer) expression returns a Task object as output result.
             return Create<TResult>((observer, token) => subscribeAsync(observer));
         }
 
+        /// <summary>
+        /// Creates an observable sequence from a specified cancellable asynchronous Subscribe method.
+        /// The CancellationToken passed to the asynchronous Subscribe method is tied to the returned disposable subscription, allowing best-effort cancellation.
+        /// Pay attention that the the result of the parameter function is Task<IDisposable>.
+        /// </summary>
+        /// <returns></returns>
         public virtual IObservable<TResult> Create<TResult>(Func<IObserver<TResult>, CancellationToken, Task<IDisposable>> subscribeAsync)
         {
             return new AnonymousObservable<TResult>(observer =>
             {
+                //SingleAssignmentDisposable represents a disposable resource which only allows a single assignment of its underlying disposable resource.
                 var subscription = new SingleAssignmentDisposable();
                 var cancellable = new CancellationDisposable();
 
+                // Create an observable object
                 var taskObservable = subscribeAsync(observer, cancellable.Token).ToObservable();
-                var taskCompletionObserver = new AnonymousObserver<IDisposable>(d => subscription.Disposable = d ?? Disposable.Empty, observer.OnError, Stubs.Nop);
+                // Initialize an observer.
+                var taskCompletionObserver = new AnonymousObserver<IDisposable>(
+                    d => subscription.Disposable = d ?? Disposable.Empty, observer.OnError, Stubs.Nop);
 
                 //
                 // We don't cancel the subscription below *ever* and want to make sure the returned resource gets disposed eventually.
@@ -118,11 +177,19 @@ namespace System.Reactive.Linq
             });
         }
 
+        /// <summary>
+        /// Creates an observable sequence from a specified asynchronous Subscribe method that can't cancel.
+        /// </summary>
         public virtual IObservable<TResult> Create<TResult>(Func<IObserver<TResult>, Task<IDisposable>> subscribeAsync)
         {
+            // call the function above. 
             return Create<TResult>((observer, token) => subscribeAsync(observer));
         }
 
+        /// <summary>
+        ///  The CancellationToken passed to the asynchronous Subscribe method is tied to the returned disposable subscription, allowing best-effort cancellation.
+        ///   Pay attention that the the result of the parameter function is Task<IDisposable>.
+        /// </summary>
         public virtual IObservable<TResult> Create<TResult>(Func<IObserver<TResult>, CancellationToken, Task<Action>> subscribeAsync)
         {
             return new AnonymousObservable<TResult>(observer =>
@@ -131,7 +198,13 @@ namespace System.Reactive.Linq
                 var cancellable = new CancellationDisposable();
 
                 var taskObservable = subscribeAsync(observer, cancellable.Token).ToObservable();
-                var taskCompletionObserver = new AnonymousObserver<Action>(a => subscription.Disposable = a != null ? Disposable.Create(a) : Disposable.Empty, observer.OnError, Stubs.Nop);
+                ///The logic of the first parameter (a stands for an action)
+                /// if a is not null
+                ///     subscription.Disposable= Disposable.Create(a);
+                ///  else
+                ///     subscription.Disposable=Disposable.Empty
+                var taskCompletionObserver = new AnonymousObserver<Action>(
+                    a => subscription.Disposable = a != null ? Disposable.Create(a) : Disposable.Empty, observer.OnError, Stubs.Nop);
 
                 //
                 // We don't cancel the subscription below *ever* and want to make sure the returned resource eventually gets disposed.
@@ -145,6 +218,7 @@ namespace System.Reactive.Linq
 
         public virtual IObservable<TResult> Create<TResult>(Func<IObserver<TResult>, Task<Action>> subscribeAsync)
         {
+            // call Create<TResult>(Func<IObserver<TResult>, CancellationToken, Task<Action>> subscribeAsync).
             return Create<TResult>((observer, token) => subscribeAsync(observer));
         }
 #endif
