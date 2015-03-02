@@ -664,18 +664,25 @@ namespace System.Reactive.Linq
         }
 
 #if !NO_TPL
+        /// <summary>
+        /// Starts an asynchronous function.  
+        /// </summary>
+        /// <typeparam name="TSource">the type of elements returned in the sequence returned by factory function.</typeparam>
+        /// <param name="functionAsync">Asynchronous function passed in. It has no input parameter but return a result of type Task<TSource>>. </param>
         public virtual IObservable<TSource> StartAsync<TSource>(Func<Task<TSource>> functionAsync)
         {
             var task = default(Task<TSource>);
             try
             {
+                // As you see, the code execute the factory function there!
                 task = functionAsync();
             }
             catch (Exception exception)
             {
                 return Throw<TSource>(exception);
             }
-
+            // And there we see another function ToObservable defined in Class  TaskObservableExtensions.
+            //   It's function is to convert Task object to Observable. 
             return task.ToObservable();
         }
 
@@ -686,6 +693,7 @@ namespace System.Reactive.Linq
             var task = default(Task<TSource>);
             try
             {
+                // There you can see it involves an cancellation parameter that allows best-effort cancellation.
                 task = functionAsync(cancellable.Token);
             }
             catch (Exception exception)
@@ -695,6 +703,7 @@ namespace System.Reactive.Linq
 
             var result = task.ToObservable();
 
+            // The CancellationToken passed to the asynchronous factory function is tied to the returned disposable subscription, allowing best-effort cancellation.
             return new AnonymousObservable<TSource>(observer =>
             {
                 //

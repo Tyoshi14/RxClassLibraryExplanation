@@ -5,6 +5,10 @@ using System;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    ///   Represents an observable that can be evaluate.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
     class AsObservable<TSource> : Producer<TSource>, IEvaluatableObservable<TSource>
     {
         private readonly IObservable<TSource> _source;
@@ -14,6 +18,7 @@ namespace System.Reactive.Linq.ObservableImpl
             _source = source;
         }
 
+        // returns the object itself!
         public IObservable<TSource> Omega()
         {
             return this;

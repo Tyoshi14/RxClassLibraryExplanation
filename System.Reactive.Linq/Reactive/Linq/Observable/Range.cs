@@ -7,6 +7,9 @@ using System.Reactive.Disposables;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Observable Empty branch.  The class can generate an int observable sequence.
+    /// </summary>
     class Range : Producer<int>
     {
         private readonly int _start;
@@ -39,13 +42,16 @@ namespace System.Reactive.Linq.ObservableImpl
 
             public IDisposable Run()
             {
+                // Returns the ISchedulerLongRunning implementation of the specified scheduler, or null if no such implementation is available.
                 var longRunning = _parent._scheduler.AsLongRunning();
                 if (longRunning != null)
                 {
+               ///longRunning.ScheduleLongRunning schedules a long-running piece of work.
                     return longRunning.ScheduleLongRunning(0, Loop);
                 }
                 else
                 {
+               /// Schedules an action to be executed recursively.
                     return _parent._scheduler.Schedule(0, LoopRec);
                 }
             }

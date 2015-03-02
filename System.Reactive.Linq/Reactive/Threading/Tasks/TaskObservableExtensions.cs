@@ -45,6 +45,9 @@ namespace System.Reactive.Threading.Tasks
             //
             // Separate method to avoid closure in synchronous completion case.
             //
+            // Again we meet a new function ContinueWith(Action<Task> continuationAction).
+            //   Descriptions: Creates a continuation that executes asynchronously when the target System.Threading.Tasks.Task completes.
+            //                  It returns a new continuation System.Threading.Tasks.Task.
             task.ContinueWith(t => ToObservableDone(task, subject));
         }
 
@@ -77,9 +80,18 @@ namespace System.Reactive.Threading.Tasks
         {
             if (task == null)
                 throw new ArgumentNullException("task");
-
-            var subject = new AsyncSubject<TResult>();
-
+            /// A new class AsyncSubject appears here.
+            ///     Explanations: Represents the result of an asynchronous operation.
+            /// Also there calls its constructor.
+            ///     Explanations: Creates a subject that can only receive one value and that value is cached for all future observations.
+            ///     Get an ImmutableList of type IObserver.     
+           var subject = new AsyncSubject<TResult>();
+            /// if task is completed
+           ///   case task state:  RanToCompletion. Then iterate the sequence.
+           ///   case task state: Faulted
+           ///   case task state: Canceled
+           ///  else
+           ///    delay to do the task until it terminates. The function executes util parameter task generates an termination signal.
             if (task.IsCompleted)
             {
                 ToObservableDone<TResult>(task, subject);
@@ -88,7 +100,9 @@ namespace System.Reactive.Threading.Tasks
             {
                 ToObservableSlow<TResult>(task, subject);
             }
-
+            /// Variable subject is a task object, but we want an Observable object.
+            /// Then we need a function  AsObservable() defined in Observable.Single.
+            ///    Description: Hides the identity of an observable sequence.
             return subject.AsObservable();
         }
 
@@ -99,13 +113,24 @@ namespace System.Reactive.Threading.Tasks
             //
             task.ContinueWith(t => ToObservableDone(t, subject));
         }
-
+/// <summary>
+///  When the task thread is completed, then it will call this function.
+///  And also completed task status contains 3 states, RanToCompletion  TaskStatus.Faulted and TaskStatus.Cancelled.
+/// </summary>
+/// <typeparam name="TResult"></typeparam>
+/// <param name="task"></param>
+/// <param name="subject"></param>
         private static void ToObservableDone<TResult>(Task<TResult> task, AsyncSubject<TResult> subject)
         {
+          
             switch (task.Status)
             {
                 case TaskStatus.RanToCompletion:
+                    ///OnNext sends a value to the subject.
+                    ///The last value received before successful termination will be sent to all subscribed and future observers.
                     subject.OnNext(task.Result);
+                    /// Notifies all subscribed observers about the end of the sequence,
+                    /// also causing the last received value to be sent out (if any).
                     subject.OnCompleted();
                     break;
                 case TaskStatus.Faulted:

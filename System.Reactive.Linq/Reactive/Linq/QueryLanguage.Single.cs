@@ -15,10 +15,14 @@ namespace System.Reactive.Linq
     internal partial class QueryLanguage
     {
         #region + AsObservable +
-
+        /// <summary>
+        ///   This function returns an Observable object which can be evaluate.  
+        /// </summary>
         public virtual IObservable<TSource> AsObservable<TSource>(IObservable<TSource> source)
         {
 #if !NO_PERF
+            /// Do you know the syntax "as" ？ I need to check it out!!!  
+            ///                                              ---- By Tyoshi
             var asObservable = source as AsObservable<TSource>;
             if (asObservable != null)
                 return asObservable.Omega();

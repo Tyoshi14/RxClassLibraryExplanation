@@ -54,24 +54,53 @@ namespace TestProject
 
        // To test Observable.Create()
        //    testObservableCreate();
+       
+       //  To test observable.Never
+       //   testObservableNever();
 
-          
-            Console.WriteLine(Observable.Range(1, 19).Sum().FirstOrDefault());
-            Console.WriteLine(Observable.Range(1, 10).Sum().FirstAsync());
-            Console.WriteLine(Observable.Range(1, 20).Sum().FirstOrDefaultAsync());
+       //     testObservableRepeat();
+
+      //      testObservableReturn();
+
             Console.ReadLine();
+        }
+
+        private static void testObservableReturn()
+        {
+            Console.WriteLine(Observable.Return<int>(100).FirstOrDefault());
+        }
+
+        private static void testObservableRepeat()
+        {
+            Console.WriteLine(Observable.Repeat<int>(5, 10).Count().FirstOrDefault());
+        }
+
+        private static void testObservableNever()
+        {
+            ///  Observable.Never() will never terminate. One writing style
+            double witness = 0.0;
+            Console.WriteLine(Observable.Never(witness).ToString());
+            // another writing style 
+            Console.WriteLine(Observable.Never<double>().ToString());
         }
 
 
         public  static void testObservableRange() {
            
-            var sumOfNumbers = Observable.Range(1, 10)
-                   .Aggregate(2, (x, y) => x + y, (x) => x - 30).FirstOrDefault();
+            //var sumOfNumbers = Observable.Range(1, 10)
+            //       .Aggregate(2, (x, y) => x + y, (x) => x - 30).FirstOrDefault();
 
-            var sumOfNumbers2 = Observable.Range(1, 20)
-                  .Aggregate(0, (x, y) => x + y, (x) => x + 55).FirstOrDefault();
+            //var sumOfNumbers2 = Observable.Range(1, 20)
+            //      .Aggregate(0, (x, y) => x + y, (x) => x + 55).FirstOrDefault();
 
-            Console.WriteLine("Sum of numbers  are  {0} and {1}", sumOfNumbers, sumOfNumbers2);
+            //Console.WriteLine("Sum of numbers  are  {0} and {1}", sumOfNumbers, sumOfNumbers2);
+            var sumOfNumbers = Observable.Range(1, 10);
+
+            for (int i = 0; i < sumOfNumbers.Count<int>().FirstOrDefault() ; i++)
+            {
+                Console.WriteLine( sumOfNumbers.ElementAt(i).FirstOrDefault()+"\n");
+            }
+          
             Console.ReadLine();
 
 

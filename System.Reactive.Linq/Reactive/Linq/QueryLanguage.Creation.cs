@@ -256,6 +256,12 @@ namespace System.Reactive.Linq
 #if !NO_TPL
         public virtual IObservable<TValue> Defer<TValue>(Func<Task<IObservable<TValue>>> observableFactoryAsync)
         {
+            // The function Defer above can create an obsevable sequence immediately. 
+            //    But this function is aimed to generate an asynchronous observable sequence. 
+            //    So we use the lambda expression to complete this function.
+            // Then there comes another question, how we can guarantee the asynchrony property?  Please see Function StartAsync.
+            //    StartAsync() is defined in Class QueryLanguage and also the explanations I made. It returns an Observable object.
+            // At last, we need function Merge() to merge elements from all inner observable sequences into a single observable sequence.
             return Defer(() => StartAsync(observableFactoryAsync).Merge());
         }
 
@@ -272,6 +278,7 @@ namespace System.Reactive.Linq
         public virtual IObservable<TResult> Empty<TResult>()
         {
 #if !NO_PERF
+            //SchedulerDefaults.ConstantTimeOperations represents an object that schedules units of work to run immediately on the current thread. 
             return new Empty<TResult>(SchedulerDefaults.ConstantTimeOperations);
 #else
             return Empty_<TResult>(SchedulerDefaults.ConstantTimeOperations);
@@ -301,6 +308,7 @@ namespace System.Reactive.Linq
         public virtual IObservable<TResult> Generate<TState, TResult>(TState initialState, Func<TState, bool> condition, Func<TState, TState> iterate, Func<TState, TResult> resultSelector)
         {
 #if !NO_PERF
+            // The last parameter SchedulerDefaults.Iteration is a CurrentThreadScheduler instance.
             return new Generate<TState, TResult>(initialState, condition, iterate, resultSelector, SchedulerDefaults.Iteration);
 #else
             return Generate_<TState, TResult>(initialState, condition, iterate, resultSelector, SchedulerDefaults.Iteration);
@@ -374,6 +382,7 @@ namespace System.Reactive.Linq
 
         public virtual IObservable<int> Range(int start, int count)
         {
+            //SchedulerDefaults.Iteration represents an object that schedules units of work on the current thread.
             return Range_(start, count, SchedulerDefaults.Iteration);
         }
 
@@ -408,7 +417,7 @@ namespace System.Reactive.Linq
         #region + Repeat +
 
         public virtual IObservable<TResult> Repeat<TResult>(TResult value)
-        {
+        { 
 #if !NO_PERF
             return new Repeat<TResult>(value, null, SchedulerDefaults.Iteration);
 #else
@@ -499,6 +508,7 @@ namespace System.Reactive.Linq
         public virtual IObservable<TResult> Throw<TResult>(Exception exception)
         {
 #if !NO_PERF
+          ///The second parameter is an ImmediateScheduler instance.
             return new Throw<TResult>(exception, SchedulerDefaults.ConstantTimeOperations);
 #else
             return Throw_<TResult>(exception, SchedulerDefaults.ConstantTimeOperations);
@@ -525,7 +535,9 @@ namespace System.Reactive.Linq
 
         #region + Using +
 
-        public virtual IObservable<TSource> Using<TSource, TResource>(Func<TResource> resourceFactory, Func<TResource, IObservable<TSource>> observableFactory) where TResource : IDisposable
+        /// Note that TSource is derived from IDisposable.
+        public virtual IObservable<TSource> Using<TSource, TResource>(Func<TResource> resourceFactory, 
+            Func<TResource, IObservable<TSource>> observableFactory) where TResource : IDisposable
         {
 #if !NO_PERF
             return new Using<TSource, TResource>(resourceFactory, observableFactory);
@@ -559,6 +571,13 @@ namespace System.Reactive.Linq
 
         public virtual IObservable<TSource> Using<TSource, TResource>(Func<CancellationToken, Task<TResource>> resourceFactoryAsync, Func<TResource, CancellationToken, Task<IObservable<TSource>>> observableFactoryAsync) where TResource : IDisposable
         {
+            /// There is a method combination of Class Observable.
+            /// Function FromAsync
+            ///     Converts to asynchronous function into an observable sequence.
+            ///  Function SelectMany
+            ///      Projects each element of an observable sequence to an observable sequence and merges the resulting observable sequences into one observable sequence.
+            ///  Function Using
+            ///      Constructs an observable sequence that depends on a resource object, whose lifetime is tied to the resulting observable sequence's lifetime.
             return Observable.FromAsync<TResource>(resourceFactoryAsync)
                 .SelectMany(resource =>
                     Observable.Using<TSource, TResource>(

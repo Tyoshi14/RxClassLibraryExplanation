@@ -8,6 +8,9 @@ namespace System.Reactive.Linq.ObservableImpl
 {
     class Throw<TResult> : Producer<TResult>
     {
+        /// <summary>
+        /// Base implement class of the Observable Throw branch
+        /// </summary>
         private readonly Exception _exception;
         private readonly IScheduler _scheduler;
 
@@ -36,6 +39,7 @@ namespace System.Reactive.Linq.ObservableImpl
 
             public IDisposable Run()
             {
+                /// Core code in Throw. The scheduler executes the function Invoke which terminates the observer and throws an error.
                 return _parent._scheduler.Schedule(Invoke);
             }
 

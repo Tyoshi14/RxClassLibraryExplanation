@@ -6,6 +6,9 @@ using System.Reactive.Concurrency;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    /// Base implement class of the Observable Return branch.  It returns an observable instance which only contains one value.
+    /// </summary>
     class Return<TResult> : Producer<TResult>
     {
         private readonly TResult _value;
@@ -34,6 +37,8 @@ namespace System.Reactive.Linq.ObservableImpl
                 _parent = parent;
             }
 
+            /// core code in Return.
+            /// Schedule a function named Invoke() to generate an observable element
             public IDisposable Run()
             {
                 return _parent._scheduler.Schedule(Invoke);

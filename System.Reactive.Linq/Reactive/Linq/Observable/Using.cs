@@ -35,6 +35,17 @@ namespace System.Reactive.Linq.ObservableImpl
                 _parent = parent;
             }
 
+            /// <summary>
+            /// The core code in Using.
+            /// 
+            /// Here comes its logic.
+            ///     Get the resource object called resource
+            ///     IF resource ne null
+            ///         Generate an element using factory function _observableFactory
+            ///  return source.subsribe()
+            ///  
+            /// </summary>
+            /// <returns></returns>
             public IDisposable Run()
             {
                 var source = default(IObservable<TSource>);
@@ -43,7 +54,7 @@ namespace System.Reactive.Linq.ObservableImpl
                 {
                     var resource = _parent._resourceFactory();
                     if (resource != null)
-                        disposable = resource;
+                        disposable = resource; /// (1)
                     source = _parent._observableFactory(resource);
                 }
                 catch (Exception exception)
@@ -51,7 +62,8 @@ namespace System.Reactive.Linq.ObservableImpl
                     return new CompositeDisposable(Observable.Throw<TSource>(exception).SubscribeSafe(this), disposable);
                 }
 
-                return new CompositeDisposable(source.SubscribeSafe(this), disposable);
+                // Form (1) and (2) we can see that the lifetime of resouce object se lifetime is tied to the resulting observable sequence's lifetime.
+                return new CompositeDisposable(source.SubscribeSafe(this), disposable);///(2)
             }
 
             public void OnNext(TSource value)

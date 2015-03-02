@@ -7,6 +7,9 @@ using System.Reactive.Disposables;
 
 namespace System.Reactive.Linq.ObservableImpl
 {
+    /// <summary>
+    ///  Base implement class of the Observable Repeat branch. It can generate an infinite observable sequence.
+    /// </summary>
     class Repeat<TResult> : Producer<TResult>
     {
         private readonly TResult _value;
@@ -24,6 +27,7 @@ namespace System.Reactive.Linq.ObservableImpl
         {
             var sink = new _(this, observer, cancel);
             setSink(sink);
+            // call inner class _'s method to generate a sequence.
             return sink.Run();
         }
 
@@ -37,6 +41,21 @@ namespace System.Reactive.Linq.ObservableImpl
                 _parent = parent;
             }
 
+/// <summary>
+/// The core codes of Class Repeat. Its main work is to execute continiously.
+/// Here is the logic
+///     IF the current schedular is a long-running
+///         IF _repeatCount is null
+///             Schedule long running which is infinite (LoopInf)
+///         ELSE
+///             Schedule finite long running (Loop)
+///     ElSE
+///         IF _repeatCount is null
+///             Schedule an action to be executed infinitely. (LoopRecInf)
+///         ELSE
+///             Schedule an action to be executed several times.(LoopRec)
+/// </summary>
+/// <returns></returns>
             public IDisposable Run()
             {
                 var longRunning = _parent._scheduler.AsLongRunning();
@@ -50,6 +69,7 @@ namespace System.Reactive.Linq.ObservableImpl
                 }
             }
 
+           /// Represents an object that schedules units of work.
             private IDisposable Run(IScheduler scheduler)
             {
                 if (_parent._repeatCount == null)
@@ -68,6 +88,7 @@ namespace System.Reactive.Linq.ObservableImpl
                 recurse();
             }
 
+          
             private void LoopRec(int n, Action<int> recurse)
             {
                 if (n > 0)
@@ -86,6 +107,7 @@ namespace System.Reactive.Linq.ObservableImpl
                 recurse(n);
             }
 
+            //ISchedulerLongRunning is a scheduler with support for starting long-running tasks.
             private IDisposable Run(ISchedulerLongRunning scheduler)
             {
                 if (_parent._repeatCount == null)

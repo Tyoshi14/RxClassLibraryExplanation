@@ -2,6 +2,10 @@
 
 namespace System.Reactive
 {
+   /// <summary>
+   ///  Represents an observable that can be evaluate.
+   /// </summary>
+   /// <typeparam name="T"></typeparam>
     interface IEvaluatableObservable<T>
     {
         IObservable<T> Eval();
