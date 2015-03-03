@@ -35,31 +35,45 @@ namespace System.Reactive.Linq.ObservableImpl
             }
 
             private AmbState _choice;
-
+/// <summary>
+/// The core code in class Amb. How it can propagate the observable sequence that reacts first?
+///     Because of the lazy evaluation of C#, it will only execute when the code runs into  SubscribeSafe.
+///     SubscribeSafe takes an observer as a parameter which will initialize only when called.
+///     In the procedure of parameter initializing, other observable resoures will dispose, only left the reacted one.
+/// </summary>
+/// <returns></returns>
             public IDisposable Run()
             {
                 var ls = new SingleAssignmentDisposable();
                 var rs = new SingleAssignmentDisposable();
                 var d = new CompositeDisposable(ls, rs);
-
+             // Initializes a new instance of the System.Object class.
                 var gate = new object();
 
+// Initialize all observers.
                 var lo = new AmbObserver();
                 lo._disposable = d;
+             // Initialize a instance of DecisionObserver class.
                 lo._target = new DecisionObserver(this, gate, AmbState.Left, ls, rs, lo);
 
                 var ro = new AmbObserver();
                 ro._disposable = d;
                 ro._target = new DecisionObserver(this, gate, AmbState.Right, rs, ls, ro);
 
+ //Initialize the Enum state to Neither.
                 _choice = AmbState.Neither;
 
+ // Observers subscribe the resource.
                 ls.Disposable = _parent._left.SubscribeSafe(lo);
                 rs.Disposable = _parent._right.SubscribeSafe(ro);
 
                 return d;
             }
 
+            /// <summary>
+            /// A class implements the interface IObserver.
+            /// Its main function is to decide which sequence is to react first according to the state of the two sequences.
+            /// </summary>
             class DecisionObserver : IObserver<TSource>
             {
                 private readonly _ _parent;
@@ -81,6 +95,14 @@ namespace System.Reactive.Linq.ObservableImpl
 
                 public void OnNext(TSource value)
                 {
+                    /// The logic in OnNext, OnError and OnCompeleted is just the same. Pls see the words below.
+                    /// IF  State(_choice)==Neither  /* Always go into this branch when the function first called!*/
+                    ///     _choice = state passed in
+                    ///     dispose otherSubscription
+                    ///     Initialize the member variables of DecisionObserver instance, _disposable and _target.
+                    /// ElSE
+                    ///     Call the corresponding functions,such as OnNext.
+                    ///     
                     lock (_gate)
                     {
                         if (_parent._choice == AmbState.Neither)
@@ -137,6 +159,12 @@ namespace System.Reactive.Linq.ObservableImpl
                 }
             }
 
+            /// <summary>
+            /// An class implements the IObserver interface.
+            /// Note that AmbObserver has no constructors, but it takes 2 public variable members, a IObserver variable and a IDisposable variable.
+            /// For the reason that member variables are public, so we can get them from outside. 
+            /// And it's an class that can dispose.
+            /// </summary>
             class AmbObserver : IObserver<TSource>
             {
                 public IObserver<TSource> _target;
@@ -161,6 +189,7 @@ namespace System.Reactive.Linq.ObservableImpl
                 }
             }
 
+            /// The enum structure that indicates the reacted state of two observable sequences.
             enum AmbState
             {
                 Left,

@@ -40,6 +40,9 @@ namespace System.Reactive.Linq
 
         private static IObservable<TSource> Amb_<TSource>(IEnumerable<IObservable<TSource>> sources)
         {
+            /// In this part, we see that Aggregate() takes 2 parameters. 
+            /// The first parameter, Observable.Never<TSource>(), will never terminate.
+            /// The second is a Lambda expression which call Observable.Amb(first,second) and returns an Observable result.
             return sources.Aggregate(Observable.Never<TSource>(), (previous, current) => previous.Amb(current));
         }
 
