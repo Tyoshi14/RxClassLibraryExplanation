@@ -34,9 +34,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Reactive.Core, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL" />
-    <Reference Include="System.Reactive.Interfaces, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL" />
-    <Reference Include="System.Reactive.Linq, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,6 +46,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\System.Reactive.Core\System.Reactive.Core.csproj">
+      <Project>{4e516f10-da7a-4d43-963e-a93865abea5b}</Project>
+      <Name>System.Reactive.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Reactive.Interfaces\System.Reactive.Interfaces.csproj">
+      <Project>{9e9b9c60-98b0-40fa-9c2b-1218d417caa4}</Project>
+      <Name>System.Reactive.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Reactive.Linq\System.Reactive.Linq.csproj">
+      <Project>{63252ae9-5186-45ca-bfcd-fa51c6b66a43}</Project>
+      <Name>System.Reactive.Linq</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
