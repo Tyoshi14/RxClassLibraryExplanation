@@ -10,6 +10,7 @@ namespace TestProject
 {
     class Program
     {
+        
         static void Main(string[] args)
         {
             var mySeries = new SortedList<DateTime, double>();
@@ -62,9 +63,35 @@ namespace TestProject
 
       //      testObservableReturn();
 
+       // TestNever
+      //     var reslt=Observable.Never<int>().Subscribe(new myob());
+
+       // Now I can debug this code[  Observable.Range(1, 2).Aggregate((x, y) => x = x + y)], but still I can't understand the inner logic of Observable.subScribe().
+       // For the reason that I see no calls for subscribe or run.Is there some problems with my debug settings??
+       // There is no problem with my debug setting. The reason is that I dont call subscribe() really!!
+       // Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault(). Debug this code will be helpful for understanding!!!
+
+            Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault();
             Console.ReadLine();
         }
+        private class myob : IObserver<int>
+        {
 
+            public void OnCompleted()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnError(Exception error)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnNext(int value)
+            {
+                throw new NotImplementedException();
+            }
+        }
         private static void testObservableReturn()
         {
             Console.WriteLine(Observable.Return<int>(100).FirstOrDefault());
