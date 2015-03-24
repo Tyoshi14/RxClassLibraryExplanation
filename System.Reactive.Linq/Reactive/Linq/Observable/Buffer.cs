@@ -505,6 +505,7 @@ namespace System.Reactive.Linq.ObservableImpl
 
             private IList<TSource> _buffer;
             private object _gate;
+            //  Asynchronous lock.
             private AsyncLock _bufferGate;
 
             private SerialDisposable _m;
@@ -516,10 +517,17 @@ namespace System.Reactive.Linq.ObservableImpl
                 _bufferGate = new AsyncLock();
 
                 _m = new SerialDisposable();
+
+                /// Question 
+                /// What's the grammer of this? why we can add {_m} after the call of constructor?
+                /// Answer: _m and _parent._source.SubscribeSafe(this) are the 2 members of groupDisposable just as parameter 2 indicates.
                 var groupDisposable = new CompositeDisposable(2) { _m };
 
                 groupDisposable.Add(_parent._source.SubscribeSafe(this));
 
+                /// The main procedure in this class.  It uses an asynchronous lock to execute an action sequence.
+                /// Call the function CreateBufferClose
+                /// CreateBufferClose and CloseBuffer will call the other interactively in order to create more buffers.
                 _bufferGate.Wait(CreateBufferClose);
 
                 return groupDisposable;
@@ -530,6 +538,7 @@ namespace System.Reactive.Linq.ObservableImpl
                 var bufferClose = default(IObservable<TBufferClosing>);
                 try
                 {
+                    /// The return type of _bufferClosingSelector is IObservable<TBufferClosing>.
                     bufferClose = _parent._bufferClosingSelector();
                 }
                 catch (Exception exception)
@@ -547,6 +556,10 @@ namespace System.Reactive.Linq.ObservableImpl
                 closingSubscription.Disposable = bufferClose.SubscribeSafe(new Omega(this, closingSubscription));
             }
 
+            /// <summary>
+            /// As the function name indicates, its function is to dispose the former resoures and start a new buffer.
+            /// </summary>
+            /// <param name="closingSubscription"></param>
             private void CloseBuffer(IDisposable closingSubscription)
             {
                 closingSubscription.Dispose();
@@ -561,6 +574,10 @@ namespace System.Reactive.Linq.ObservableImpl
                 _bufferGate.Wait(CreateBufferClose);
             }
 
+            /// <summary>
+            ///  An instance of type IObserver. 
+            ///  Its function is to close a buffer when encounters with a terminal conditon.
+            /// </summary>
             class Omega : IObserver<TBufferClosing>
             {
                 private readonly _ _parent;
@@ -588,6 +605,8 @@ namespace System.Reactive.Linq.ObservableImpl
                 }
             }
 
+           // The 3 following functions are inherited from IObserver. 
+           // They can manage the buffers and complete observation.
             public void OnNext(TSource value)
             {
                 lock (_gate)
@@ -629,7 +648,7 @@ namespace System.Reactive.Linq.ObservableImpl
 
             private IList<TSource> _buffer;
             private object _gate;
-
+            // Represents a disposable resource that only disposes its underlying disposable resource when all <see cref="GetDisposable">dependent disposable objects</see> have been disposed.
             private RefCountDisposable _refCountDisposable;
 
             public IDisposable Run()

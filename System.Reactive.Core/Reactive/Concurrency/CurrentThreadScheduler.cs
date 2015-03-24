@@ -182,7 +182,7 @@ namespace System.Reactive.Concurrency
                         {
                             ConcurrencyAbstractionLayer.Current.Sleep(wait);
                         }
-
+// There we can see the Observer.OnNext() is called!!!
                         if (!item.IsCanceled)
                             item.Invoke();
                     }

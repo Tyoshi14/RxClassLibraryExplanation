@@ -71,9 +71,28 @@ namespace TestProject
        // There is no problem with my debug setting. The reason is that I dont call subscribe() really!!
        // Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault(). Debug this code will be helpful for understanding!!!
 
-            Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault();
+      //      Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault();
+       //     Console.ReadLine();
+
+
+            testBufferWithBoundries();
+           
             Console.ReadLine();
+
         }
+
+       
+        private static void testBufferWithBoundries()
+        {
+            int countNum = 0;
+            var newsource = Observable.Range(1, 10);
+            newsource.Buffer(newsource.Scan((a, c) => a + c).SkipWhile(a => a < 0)).Subscribe(
+                            x => Console.WriteLine("Number {0} : OnNext: {1}", countNum++, x.FirstOrDefault()),
+                            ex => Console.WriteLine("Number {0} : OnError: {1}", countNum - 1, ex.Message),
+                            () => Console.WriteLine("Number {0}: OnCompleted", countNum - 1)
+                );
+        }
+
         private class myob : IObserver<int>
         {
 
