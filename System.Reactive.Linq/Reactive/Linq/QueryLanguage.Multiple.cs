@@ -254,9 +254,13 @@ namespace System.Reactive.Linq
 
         public virtual IObservable<TSource> Catch<TSource>(IObservable<TSource> first, IObservable<TSource> second)
         {
+            // Call another static method called Catch_ whose parametor is IEnumerable<IObservable<TSource>>
             return Catch_<TSource>(new[] { first, second });
         }
 
+        // key words : params
+        // By using the params keyword, you can specify a method parameter that takes a variable number of arguments.
+        // You can regard it as IEnumerable<IObservable<TSource>>.
         public virtual IObservable<TSource> Catch<TSource>(params IObservable<TSource>[] sources)
         {
             return Catch_<TSource>(sources);

@@ -19,11 +19,15 @@ namespace System.Reactive.Linq.ObservableImpl
 
         protected override IDisposable Run(IObserver<TSource> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
+            //  Here is a little bit different from others  for we cant see the parameter this because the original source is of type IEnumerable.
             var sink = new _(observer, cancel);
             setSink(sink);
             return sink.Run(_sources);
         }
 
+        // There we meet a new class TailRecursiveSink with type definition parameters.
+        // TailRecursiveSink:
+        //     provides a lightweight sink that can execute recursively.
         class _ : TailRecursiveSink<TSource>
         {
             public _(IObserver<TSource> observer, IDisposable cancel)
@@ -117,6 +121,10 @@ namespace System.Reactive.Linq.ObservableImpl
                 base._observer.OnNext(value);
             }
 
+            // As the instructions in Observable.Multiple says
+            // Continues an observable sequence that is terminated by an exception of the specified type with the observable sequence produced by the handler.
+            // The code below is the key point!
+            // I want to say  that _.OnNext is not the same with Sink.OnNext, but the former needs to call the later to terminate the whole process.
             public void OnError(Exception error)
             {
                 var e = error as TException;
@@ -129,11 +137,17 @@ namespace System.Reactive.Linq.ObservableImpl
                     }
                     catch (Exception ex)
                     {
+                        // This is the branch of anther error caused by handler function. 
+                        // It will terminate the observation immediately.
                         base._observer.OnError(ex);
                         base.Dispose();
                         return;
                     }
 
+                    // The procedure when catch the specified exception type TException.
+                    // You may wonder how  this function can continue the observation when an TException occurs.
+                    // The reason is that we subscribe a new Observable sequence again. The code  result.SubscribeSafe(new Impl(this)) does this thing.
+                    // Note that we need a new observer whose callbacks have the same function with class _, so class Impl comes to birth.
                     var d = new SingleAssignmentDisposable();
                     _subscription.Disposable = d;
                     d.Disposable = result.SubscribeSafe(new Impl(this));

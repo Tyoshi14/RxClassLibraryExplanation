@@ -21,6 +21,7 @@ namespace System.Reactive
         private Stack<int?> _length;
         protected Action _recurse;
 
+        // A　more method is added compared to Class Sink.
         public IDisposable Run(IEnumerable<IObservable<TSource>> sources)
         {
             _isDisposed = false;
@@ -36,6 +37,10 @@ namespace System.Reactive
             _stack.Push(e);
             _length.Push(Helpers.GetLength(sources));
 
+            /// <summary>
+            /// Function Schedule
+            ///     Schedules an action to be executed recursively.
+            /// </summary>
             var cancelable = SchedulerDefaults.TailRecursion.Schedule(self =>
             {
                 _recurse = self;
@@ -59,7 +64,9 @@ namespace System.Reactive
 
                 if (_isDisposed)
                     return;
-
+                // Funtion Peek
+                //Returns the object at the top of the System.Collections.Generic.Stack<T>
+                //     without removing it.
                 var e = _stack.Peek();
                 var l = _length.Peek();
 
@@ -67,6 +74,7 @@ namespace System.Reactive
                 try
                 {
                     hasNext = e.MoveNext();
+                    // Gets the element in the collection at the current position of the enumerator.
                     if (hasNext)
                         current = e.Current;
                 }
@@ -83,11 +91,13 @@ namespace System.Reactive
                 {
                     e.Dispose();
 
+                    // Function:Pop  Removes and returns the object at the top of the System.Collections.Generic.Stack<T>.
                     _stack.Pop();
                     _length.Pop();
                 }
                 else
                 {
+                    // Change the number in the _length stack
                     var r = l - 1;
                     _length.Pop();
                     _length.Push(r);
