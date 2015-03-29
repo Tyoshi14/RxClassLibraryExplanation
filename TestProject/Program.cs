@@ -13,41 +13,42 @@ namespace TestProject
         
         static void Main(string[] args)
         {
-            var mySeries = new SortedList<DateTime, double>();
-            mySeries.Add(new DateTime(2011, 01, 1), 10);
-            mySeries.Add(new DateTime(2011, 01, 2), 25);
-            mySeries.Add(new DateTime(2011, 01, 3), 30);
-            mySeries.Add(new DateTime(2011, 01, 4), 45);
-            mySeries.Add(new DateTime(2011, 01, 5), 50);
-            mySeries.Add(new DateTime(2011, 01, 6), 65);
+            //var mySeries = new SortedList<DateTime, double>();
+            //mySeries.Add(new DateTime(2011, 01, 1), 10);
+            //mySeries.Add(new DateTime(2011, 01, 2), 25);
+            //mySeries.Add(new DateTime(2011, 01, 3), 30);
+            //mySeries.Add(new DateTime(2011, 01, 4), 45);
+            //mySeries.Add(new DateTime(2011, 01, 5), 50);
+            //mySeries.Add(new DateTime(2011, 01, 6), 65);
 
-            var calcs = new calculations();
-            var avg = calcs.MovingAverage(mySeries, 3);
-            foreach (var item in avg)
-            {
-                Console.WriteLine("{0} {1}", item.Key, item.Value);
-            }
+            //var calcs = new calculations();
+            //var avg = calcs.MovingAverage(mySeries, 3);
+            //foreach (var item in avg)
+            //{
+            //    Console.WriteLine("{0} {1}", item.Key, item.Value);
+            //}
+
 
 
  // I find these codes on the web to see how Rx works.
             // Rx 中  Observable 类对 IObservable 进行了扩展，增加了一些静态，例如代码中的Interval的方法，可以供user使用。
             // Subscribe方法 不在 Rx 的命名空间之下，但是也是采用同样的方法实现了对 IObservable 的方法扩展。
 
-            IObservable<long> source =Observable.Interval(TimeSpan.FromSeconds(1));
+            //IObservable<long> source =Observable.Interval(TimeSpan.FromSeconds(1));
 
-            IDisposable subscription1 = source.Subscribe(
-                            x => Console.WriteLine("Observer 1: OnNext: {0}", x),
-                            ex => Console.WriteLine("Observer 1: OnError: {0}", ex.Message),
-                            () => Console.WriteLine("Observer 1: OnCompleted"));
+            //IDisposable subscription1 = source.Subscribe(
+            //                x => Console.WriteLine("Observer 1: OnNext: {0}", x),
+            //                ex => Console.WriteLine("Observer 1: OnError: {0}", ex.Message),
+            //                () => Console.WriteLine("Observer 1: OnCompleted"));
 
-            IDisposable subscription2 = source.Subscribe(
-                            x => Console.WriteLine("Observer 2: OnNext: {0}", x),
-                            ex => Console.WriteLine("Observer 2: OnError: {0}", ex.Message),
-                            () => Console.WriteLine("Observer 2: OnCompleted"));
+            //IDisposable subscription2 = source.Subscribe(
+            //                x => Console.WriteLine("Observer 2: OnNext: {0}", x),
+            //                ex => Console.WriteLine("Observer 2: OnError: {0}", ex.Message),
+            //                () => Console.WriteLine("Observer 2: OnCompleted"));
 
-            Console.WriteLine("Press any key to unsubscribe");
-            subscription1.Dispose();
-            subscription2.Dispose();
+            //Console.WriteLine("Press any key to unsubscribe");
+            //subscription1.Dispose();
+            //subscription2.Dispose();
 
 
        // To test observable.Range
@@ -75,10 +76,147 @@ namespace TestProject
        //     Console.ReadLine();
 
 
-            testBufferWithBoundries();
+       //     testBufferWithBoundries();
            
-            Console.ReadLine();
 
+            /// TO TEST IEnumerable MOVEAVERAGE
+           // testMoveAverageIEnumerable();
+
+            // Move Average with RX
+            testMoveAverageWithRx();
+
+            // This is another example that uses Rx to implement the functin of MoveAverage
+            // Note that Asympotic time complexity is O(n)
+           //testMoveAverageWithRx2();
+
+            moveAverageWithObservable();
+               
+            Console.ReadLine();
+        }
+
+        private static void moveAverageWithObservable()
+        {
+            var delta = 3;
+            var series = new[] { 1.1, 2.5, 3.8, 4.8, 5.9, 6.1, 7.6 };
+            var newSeries = series.ToObservable();
+
+            int count = 0;
+
+            var seed = default(Double);
+            newSeries.Take(delta).Sum().Subscribe(x => seed = x);
+          // There I can get the  correct sum.
+          //  Console.WriteLine(seed);
+            var result = Observable.Repeat(0.0, delta - 1).Concat(Observable.Repeat(seed / delta, 1));
+
+
+            //newSeries.Skip(delta)
+            //    // .Catch(newSeries)
+            //   // .Merge(newSeries)
+            //   // .Aggregate(seed, (x, y) => seed = (seed - x + y) / delta)
+            //    .Subscribe(Console.WriteLine);
+
+
+          
+            //newSeries.Window(delta).ForEach(ob => {
+
+            //    Console.Write(count+++"\t");
+            //    ob.Average().Subscribe(Console.WriteLine);
+            //});
+
+           var avarega= newSeries.Zip<double, double, double>(newSeries.Skip(delta), (x, y) =>
+            {
+               // Console.Write(count++ + ":\t " + x.ToString() + " " + y.ToString() + "\t");
+                seed = seed - x + y;
+                return seed / delta;
+            });
+
+           result.Concat(avarega).Subscribe(ob => {
+               Console.WriteLine(count++ + ":\t "+ ob);
+           });
+
+           
+        }
+        
+
+        private static void testMoveAverageWithRx2()
+        {
+            var mySeries = new SortedList<DateTime, double>();
+            mySeries.Add(new DateTime(2011, 01, 1), 10);
+            mySeries.Add(new DateTime(2011, 01, 2), 25);
+            mySeries.Add(new DateTime(2011, 01, 3), 30);
+            mySeries.Add(new DateTime(2011, 01, 4), 45);
+            mySeries.Add(new DateTime(2011, 01, 5), 50);
+            mySeries.Add(new DateTime(2011, 01, 6), 65);
+
+            int period = 3;
+
+            var results = mySeries.Skip(period - 1).Aggregate(
+                new
+                {
+                    Result = new SortedList<DateTime, double>(),
+                    Working = new List<double>(mySeries.Take(period - 1).Select(item => item.Value))
+                },
+                (list, item) =>
+                {
+                    list.Working.Add(item.Value);
+                    list.Result.Add(item.Key, list.Working.Average());
+                    list.Working.RemoveAt(0);
+                    return list;
+                }
+              ).Result;
+
+            int count = 0;
+            foreach (var item in results)
+            {
+                count++;
+                Console.WriteLine(count + " : " + item + "\n");
+            }
+        }
+
+        private static void testMoveAverageWithRx()
+        {
+            var delta = 3;
+            var series = new[] { 1.1, 2.5, 3.8, 4.8, 5.9, 6.1, 7.6 };
+
+            // Take: Returns a specified number of contiguous elements from the start of a sequence.
+            // Skip:  Bypasses a specified number of elements in a sequence and then returns the
+            //     remaining elements.
+            // Zip : Merges two sequences by using the specified predicate function.
+            var seed = series.Take(delta).Average();
+            var smas = series
+                .Skip(delta)
+                .Zip(series, Tuple.Create)
+                .Scan(seed, (sma, values) => sma - (values.Item2 / delta) + (values.Item1 / delta));
+
+            // Repeat :  Generates a sequence that contains one repeated value.
+            // Concat: Concatenates two sequences.
+            // At the end we do some cleanup by adding zeroes for the length of the first period and adding the initial seed value.
+            smas = Enumerable.Repeat(0.0, delta - 1).Concat(new[] { seed }).Concat(smas);
+            int count = 0;
+
+            foreach (var item in smas)
+            {
+                count++;
+                Console.WriteLine(count + " : " + item + "\n");
+            }
+        }
+
+
+        private static void testMoveAverageIEnumerable()
+        {
+            double[] intergers = new double[100];
+            for (int i = 0; i < 100; i++)
+            {
+                intergers[i] = (double)i;
+            }
+
+            IEnumerable<double> result = intergers.MovingAverage(10);
+            int count = 0;
+            foreach (var item in result)
+            {
+                count++;
+                Console.WriteLine(count + " : " + item + "\n");
+            }
         }
 
        
@@ -179,18 +317,32 @@ namespace TestProject
         public SortedList<DateTime, double> MovingAverage(SortedList<DateTime, double> series, int period)
         {
             var result = new SortedList<DateTime, double>();
-
+            double total = 0;
             for (int i = 0; i < series.Count(); i++)
             {
+                //if (i >= period - 1)
+                //{
+                //    double total = 0;
+                //    for (int x = i; x > (i - period); x--)
+                //        total += series.Values[x];
+                //    double average = total / period;
+                //    result.Add(series.Keys[i], average);
+                //}
+
+                /// Another way to write this code 
+                ///  This way may be faster than the fomer.
+                if(i>=period) 
+                {
+                    total -= series.Values[i - period];
+                }
+                total += series.Values[i];
+
                 if (i >= period - 1)
                 {
-                    double total = 0;
-                    for (int x = i; x > (i - period); x--)
-                        total += series.Values[x];
                     double average = total / period;
                     result.Add(series.Keys[i], average);
                 }
-
+               
             }
             return result;
         }
