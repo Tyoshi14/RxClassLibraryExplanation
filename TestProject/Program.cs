@@ -121,7 +121,7 @@ namespace TestProject
             {
                 throw new NotImplementedException();
             }
-
+               
             public void OnNext(int value)
             {
                 throw new NotImplementedException();
@@ -158,15 +158,14 @@ namespace TestProject
             //    ob.Average().Subscribe(Console.WriteLine);
             //});
 
-           var avarega= newSeries.Zip<double, double, double>(newSeries.Skip(delta), (x, y) =>
-            {
+            var avarega = newSeries.Zip<double, double, double>(newSeries.Skip(delta), (x, y) => {
                // Console.Write(count++ + ":\t " + x.ToString() + " " + y.ToString() + "\t");
                 seed = seed - x + y;
                 return seed / delta;
             });
 
            result.Concat(avarega).Subscribe(ob => {
-               Console.WriteLine(count++ + ":\t "+ ob);
+                Console.WriteLine(count++ + ":\t " + ob);
            });
 
            
@@ -186,13 +185,11 @@ namespace TestProject
             int period = 3;
 
             var results = mySeries.Skip(period - 1).Aggregate(
-                new
-                {
+                new {
                     Result = new SortedList<DateTime, double>(),
                     Working = new List<double>(mySeries.Take(period - 1).Select(item => item.Value))
                 },
-                (list, item) =>
-                {
+                (list, item) => {
                     list.Working.Add(item.Value);
                     list.Result.Add(item.Key, list.Working.Average());
                     list.Working.RemoveAt(0);
@@ -201,7 +198,7 @@ namespace TestProject
               ).Result;
 
             int count = 0;
-            foreach (var item in results)
+            foreach(var item in results)
             {
                 count++;
                 Console.WriteLine(count + " : " + item + "\n");
@@ -218,7 +215,8 @@ namespace TestProject
             //     remaining elements.
             // Zip : Merges two sequences by using the specified predicate function.
             var seed = series.Take(delta).Average();
-            var smas = series
+            //with a minor modification smas is an IObservable now
+            var smas = series.ToObservable()
                 .Skip(delta)
                 .Zip(series, Tuple.Create)
                 .Scan(seed, (sma, values) => sma - (values.Item2 / delta) + (values.Item1 / delta));
@@ -226,28 +224,25 @@ namespace TestProject
             // Repeat :  Generates a sequence that contains one repeated value.
             // Concat: Concatenates two sequences.
             // At the end we do some cleanup by adding zeroes for the length of the first period and adding the initial seed value.
-            smas = Enumerable.Repeat(0.0, delta - 1).Concat(new[] { seed }).Concat(smas);
-            int count = 0;
-
-            foreach (var item in smas)
-            {
-                count++;
-                Console.WriteLine(count + " : " + item + "\n");
-            }
+            smas = Observable.Repeat(double.NaN, delta - 1).Concat(new[] { seed }.ToObservable()).Concat(smas);
+            var _ = smas.Zip(Observable.Range(0, series.Length), (x, i) => {
+                Console.WriteLine(i + " : " + x + "\n");
+                return x;
+            }).Wait();
         }
 
 
         private static void testMoveAverageIEnumerable()
         {
             double[] intergers = new double[100];
-            for (int i = 0; i < 100; i++)
+            for(int i = 0; i < 100; i++)
             {
                 intergers[i] = (double)i;
             }
 
             IEnumerable<double> result = intergers.MovingAverage(10);
             int count = 0;
-            foreach (var item in result)
+            foreach(var item in result)
             {
                 count++;
                 Console.WriteLine(count + " : " + item + "\n");
@@ -286,7 +281,8 @@ namespace TestProject
         }
 
 
-        public  static void testObservableRange() {
+        public static void testObservableRange()
+        {
            
             //var sumOfNumbers = Observable.Range(1, 10)
             //       .Aggregate(2, (x, y) => x + y, (x) => x - 30).FirstOrDefault();
@@ -297,9 +293,9 @@ namespace TestProject
             //Console.WriteLine("Sum of numbers  are  {0} and {1}", sumOfNumbers, sumOfNumbers2);
             var sumOfNumbers = Observable.Range(1, 10);
 
-            for (int i = 0; i < sumOfNumbers.Count<int>().FirstOrDefault() ; i++)
+            for(int i = 0; i < sumOfNumbers.Count<int>().FirstOrDefault(); i++)
             {
-                Console.WriteLine( sumOfNumbers.ElementAt(i).FirstOrDefault()+"\n");
+                Console.WriteLine(sumOfNumbers.ElementAt(i).FirstOrDefault() + "\n");
             }
           
             Console.ReadLine();
@@ -310,8 +306,7 @@ namespace TestProject
         public static void testObservableCreate()
         {
             var ob = Observable.Create<string>(
-             observer =>
-             {
+             observer => {
                  var timer = new System.Timers.Timer();
                  timer.Interval = 1000;
                  timer.Elapsed += (s, e) => observer.OnNext("tick");
@@ -335,7 +330,7 @@ namespace TestProject
         {
             var result = new SortedList<DateTime, double>();
             double total = 0;
-            for (int i = 0; i < series.Count(); i++)
+            for(int i = 0; i < series.Count(); i++)
             {
                 //if (i >= period - 1)
                 //{
@@ -348,13 +343,13 @@ namespace TestProject
 
                 /// Another way to write this code 
                 ///  This way may be faster than the fomer.
-                if(i>=period) 
+                if(i >= period)
                 {
                     total -= series.Values[i - period];
                 }
                 total += series.Values[i];
 
-                if (i >= period - 1)
+                if(i >= period - 1)
                 {
                     double average = total / period;
                     result.Add(series.Keys[i], average);
