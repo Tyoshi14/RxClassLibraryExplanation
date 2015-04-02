@@ -83,16 +83,51 @@ namespace TestProject
            // testMoveAverageIEnumerable();
 
             // Move Average with RX
-            testMoveAverageWithRx();
+            //  testMoveAverageWithRx();
 
             // This is another example that uses Rx to implement the functin of MoveAverage
             // Note that Asympotic time complexity is O(n)
            //testMoveAverageWithRx2();
 
-            moveAverageWithObservable();
+            // This is a example to finish the moveAverage function with Observable object.
+            //moveAverageWithObservable();
+
+            // There begin the function to get the empircial distribution.
+
+            Random r = new Random();
+            int count = 128;
+            var data = new int[count];
+           // A good example to use Observable.Create()
+            // http://stackoverflow.com/questions/22811411/partitioning-sequence-with-reactive-extensions/22846241#22846241
+
+            IObservable<char> keyboardStream;
+            var persistedStream = keyboardStream.Publish().RefCount();
+            var bufferedBySemicolon = persistedStream.Buffer(persistedStream.Where(c => c == ';'));
                
-            Console.ReadLine();
+          
+            
+            //Console.ReadLine();
         }
+
+        private class myob : IObserver<int>
+        {
+
+            public void OnCompleted()
+            {
+                throw new NotImplementedException(); 
+            }
+
+            public void OnError(Exception error)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnNext(int value)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
 
         private static void moveAverageWithObservable()
         {
@@ -231,24 +266,6 @@ namespace TestProject
                 );
         }
 
-        private class myob : IObserver<int>
-        {
-
-            public void OnCompleted()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void OnError(Exception error)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void OnNext(int value)
-            {
-                throw new NotImplementedException();
-            }
-        }
         private static void testObservableReturn()
         {
             Console.WriteLine(Observable.Return<int>(100).FirstOrDefault());

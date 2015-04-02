@@ -1,0 +1,60 @@
+﻿
+(一) Before seeing the pseudocode we need to define a new class to store our returned data.
+
+public class  DataItem{
+
+	private double key;  // Store the value that we get from the Observable sequence. Note that we each key is unique.
+	private int countl;  // The count of each key.
+	private double probability; 
+
+	someMethods;  // This represents all the functions to get and set member variables.
+}
+
+
+
+(二) The followings are the pseudocode of Emprical distribution.
+
+Observable<double> data= Procedure2GetPushData();
+
+Observable<List<double>> subData= ConvertData2DoubleList();
+
+// We have a global varaible List<DataItem>to store the value and key infomation. 
+// That’s also what we depend on to determine the coming data.
+ List<DataItem>  results;
+
+// store the total number of data.
+ int  totalCount;
+
+
+forEach List<double> listItem in subData
+    double[] listArray= listItem2DoubleArray();
+	QuickSort(listArray);
+	RefreshTotalNumber(totalCount);
+
+	foreach item in listArray
+		AdjustKeyValuePair(item);  // We need to adjust elements in varaible results. 
+
+
+CalculateProbility();   // Traverse  List<DataItem>  results to calculate the empirical distribution
+
+
+（三 ） The procedure of AdjustKeyValuePair(item).
+
+    if results contains item
+	   the item count in results + 1;
+	else
+	   Add a new DataItem in results.
+
+
+
+
+
+
+（四）
+Note that:
+	 When we need to deal with big data, the program will run out of memory.  So we need a special data structure to handle this problem. What is it??
+
+	 The second question is that I'm now not familiar with Rx which makes it a little bit hard for me to write the code of Procedure2GetPushData() and ConvertData2DoubleList().
+ So I need much more time to study how to use Rx from the website http://rxwiki.wikidot.com/101samples.  OK ?? 
+
+  
