@@ -23,7 +23,7 @@ namespace System.Reactive
     /// Base class for implementation of query operators, providing performance benefits over the use of Observable.Create.
     /// </summary>
     /// <typeparam name="TSource">Type of the resulting sequence's elements.</typeparam>
-    internal abstract class Producer<TSource> : IProducer<TSource>
+    public abstract class Producer<TSource> : IProducer<TSource>
     {
         /// <summary>
         /// Publicly visible Subscribe method.

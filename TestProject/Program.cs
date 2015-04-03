@@ -10,7 +10,7 @@ namespace TestProject
 {
     class Program
     {
-        
+
         static void Main(string[] args)
         {
             //var mySeries = new SortedList<DateTime, double>();
@@ -30,7 +30,7 @@ namespace TestProject
 
 
 
- // I find these codes on the web to see how Rx works.
+            // I find these codes on the web to see how Rx works.
             // Rx 中  Observable 类对 IObservable 进行了扩展，增加了一些静态，例如代码中的Interval的方法，可以供user使用。
             // Subscribe方法 不在 Rx 的命名空间之下，但是也是采用同样的方法实现了对 IObservable 的方法扩展。
 
@@ -51,62 +51,62 @@ namespace TestProject
             //subscription2.Dispose();
 
 
-       // To test observable.Range
-       // testObservableRange();
+            // To test observable.Range
+            // testObservableRange();
 
-       // To test Observable.Create()
-       //    testObservableCreate();
-       
-       //  To test observable.Never
-       //   testObservableNever();
+            // To test Observable.Create()
+            //    testObservableCreate();
 
-       //     testObservableRepeat();
+            //  To test observable.Never
+            //   testObservableNever();
 
-      //      testObservableReturn();
+            //     testObservableRepeat();
 
-       // TestNever
-      //     var reslt=Observable.Never<int>().Subscribe(new myob());
+            //      testObservableReturn();
 
-       // Now I can debug this code[  Observable.Range(1, 2).Aggregate((x, y) => x = x + y)], but still I can't understand the inner logic of Observable.subScribe().
-       // For the reason that I see no calls for subscribe or run.Is there some problems with my debug settings??
-       // There is no problem with my debug setting. The reason is that I dont call subscribe() really!!
-       // Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault(). Debug this code will be helpful for understanding!!!
+            // TestNever
+            //     var reslt=Observable.Never<int>().Subscribe(new myob());
 
-      //      Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault();
-       //     Console.ReadLine();
+            // Now I can debug this code[  Observable.Range(1, 2).Aggregate((x, y) => x = x + y)], but still I can't understand the inner logic of Observable.subScribe().
+            // For the reason that I see no calls for subscribe or run.Is there some problems with my debug settings??
+            // There is no problem with my debug setting. The reason is that I dont call subscribe() really!!
+            // Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault(). Debug this code will be helpful for understanding!!!
+
+            //      Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault();
+            //     Console.ReadLine();
 
 
-       //     testBufferWithBoundries();
-           
+            //     testBufferWithBoundries();
+
 
             /// TO TEST IEnumerable MOVEAVERAGE
-           // testMoveAverageIEnumerable();
+            // testMoveAverageIEnumerable();
 
             // Move Average with RX
             //  testMoveAverageWithRx();
 
             // This is another example that uses Rx to implement the functin of MoveAverage
             // Note that Asympotic time complexity is O(n)
-           //testMoveAverageWithRx2();
+            //testMoveAverageWithRx2();
 
             // This is a example to finish the moveAverage function with Observable object.
             //moveAverageWithObservable();
 
             // There begin the function to get the empircial distribution.
 
-            Random r = new Random();
-            int count = 128;
-            var data = new int[count];
-           // A good example to use Observable.Create()
+            //Random r = new Random();
+            //int count = 128;
+            //var data = new int[count];
+            // A good example to use Observable.Create()
             // http://stackoverflow.com/questions/22811411/partitioning-sequence-with-reactive-extensions/22846241#22846241
 
-            IObservable<char> keyboardStream;
-            var persistedStream = keyboardStream.Publish().RefCount();
-            var bufferedBySemicolon = persistedStream.Buffer(persistedStream.Where(c => c == ';'));
-               
-          
-            
-            //Console.ReadLine();
+            //IObservable<char> keyboardStream;
+            //var persistedStream = keyboardStream.Publish().RefCount();
+            //var bufferedBySemicolon = persistedStream.Buffer(persistedStream.Where(c => c == ';'));
+
+
+            testECDF();
+            Console.ReadLine();
         }
 
         private class myob : IObserver<int>
@@ -114,14 +114,14 @@ namespace TestProject
 
             public void OnCompleted()
             {
-                throw new NotImplementedException(); 
+                throw new NotImplementedException();
             }
 
             public void OnError(Exception error)
             {
                 throw new NotImplementedException();
             }
-               
+
             public void OnNext(int value)
             {
                 throw new NotImplementedException();
@@ -139,8 +139,8 @@ namespace TestProject
 
             var seed = default(Double);
             newSeries.Take(delta).Sum().Subscribe(x => seed = x);
-          // There I can get the  correct sum.
-          //  Console.WriteLine(seed);
+            // There I can get the  correct sum.
+            //  Console.WriteLine(seed);
             var result = Observable.Repeat(0.0, delta - 1).Concat(Observable.Repeat(seed / delta, 1));
 
 
@@ -151,7 +151,7 @@ namespace TestProject
             //    .Subscribe(Console.WriteLine);
 
 
-          
+
             //newSeries.Window(delta).ForEach(ob => {
 
             //    Console.Write(count+++"\t");
@@ -159,18 +159,18 @@ namespace TestProject
             //});
 
             var avarega = newSeries.Zip<double, double, double>(newSeries.Skip(delta), (x, y) => {
-               // Console.Write(count++ + ":\t " + x.ToString() + " " + y.ToString() + "\t");
+                // Console.Write(count++ + ":\t " + x.ToString() + " " + y.ToString() + "\t");
                 seed = seed - x + y;
                 return seed / delta;
             });
 
-           result.Concat(avarega).Subscribe(ob => {
+            result.Concat(avarega).Subscribe(ob => {
                 Console.WriteLine(count++ + ":\t " + ob);
-           });
+            });
 
-           
+
         }
-        
+
 
         private static void testMoveAverageWithRx2()
         {
@@ -249,7 +249,7 @@ namespace TestProject
             }
         }
 
-       
+
         private static void testBufferWithBoundries()
         {
             int countNum = 0;
@@ -283,7 +283,7 @@ namespace TestProject
 
         public static void testObservableRange()
         {
-           
+
             //var sumOfNumbers = Observable.Range(1, 10)
             //       .Aggregate(2, (x, y) => x + y, (x) => x - 30).FirstOrDefault();
 
@@ -297,7 +297,7 @@ namespace TestProject
             {
                 Console.WriteLine(sumOfNumbers.ElementAt(i).FirstOrDefault() + "\n");
             }
-          
+
             Console.ReadLine();
 
 
@@ -320,7 +320,20 @@ namespace TestProject
             subscription.Dispose();
         }
 
-        
+        public static void testECDF()
+        {
+            Random rand = new Random();
+            var result = Observable.Range(0, 10).Select((_) => rand.Next(3) + rand.Next(3)).ECDF();
+            result.Subscribe((ecdf) => {
+                Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
+                foreach(var kv in ecdf)
+                {
+                    Console.WriteLine("{0},{1}", kv.Key, kv.Value);
+                }
+                Console.WriteLine("{0} pairs printed!", ecdf.Count);
+            });
+            Console.WriteLine("Test is done!");
+        }
     }
 
 
@@ -354,7 +367,7 @@ namespace TestProject
                     double average = total / period;
                     result.Add(series.Keys[i], average);
                 }
-               
+
             }
             return result;
         }

@@ -10,7 +10,7 @@ namespace System.Reactive
     /// </summary>
     /// <typeparam name="TSource">Type of the resulting sequence's elements.</typeparam>
     /// <remarks>Implementations of sinks are responsible to enforce the message grammar on the associated observer. Upon sending a terminal message, a pairing Dispose call should be made to trigger cancellation of related resources and to mute the outgoing observer.</remarks>
-    internal abstract class Sink<TSource> : IDisposable
+    public abstract class Sink<TSource> : IDisposable
     {
        // key words volatile:
        // The point of volatile is that multiple threads running on multiple CPU's can and will cache data and re-order instructions.
