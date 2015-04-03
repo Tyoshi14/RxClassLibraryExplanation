@@ -5,6 +5,8 @@ using System.Text;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
+
 
 namespace TestProject
 {
@@ -94,20 +96,13 @@ namespace TestProject
 
             // There begin the function to get the empircial distribution.
 
-            Random r = new Random();
-            int count = 128;
-            var data = new int[count];
-           // A good example to use Observable.Create()
-            // http://stackoverflow.com/questions/22811411/partitioning-sequence-with-reactive-extensions/22846241#22846241
 
-            IObservable<char> keyboardStream;
-            var persistedStream = keyboardStream.Publish().RefCount();
-            var bufferedBySemicolon = persistedStream.Buffer(persistedStream.Where(c => c == ';'));
-               
-          
-            
-            //Console.ReadLine();
+            Console.ReadLine();
         }
+
+      
+       
+
 
         private class myob : IObserver<int>
         {
@@ -223,8 +218,9 @@ namespace TestProject
 
             // Repeat :  Generates a sequence that contains one repeated value.
             // Concat: Concatenates two sequences.
-            // At the end we do some cleanup by adding zeroes for the length of the first period and adding the initial seed value.
+           
             smas = Observable.Repeat(double.NaN, delta - 1).Concat(new[] { seed }.ToObservable()).Concat(smas);
+            // There we use the zip Function to print out the results.
             var _ = smas.Zip(Observable.Range(0, series.Length), (x, i) => {
                 Console.WriteLine(i + " : " + x + "\n");
                 return x;

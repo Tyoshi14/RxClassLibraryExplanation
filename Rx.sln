@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.22609.0
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Reactive.Linq", "System.Reactive.Linq\System.Reactive.Linq.csproj", "{63252AE9-5186-45CA-BFCD-FA51C6B66A43}"
 EndProject
@@ -53,6 +53,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Reactive.Observable.Aliases", "System.Reactive.Observable.Aliases\System.Reactive.Observable.Aliases.csproj", "{9FFAC385-10A4-4DDD-B800-DE67E8469CC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{CC073ACF-30AB-4CE5-9F29-94A911F57EF4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0CCCF009-763F-40D2-8655-7A94828023BF} = {0CCCF009-763F-40D2-8655-7A94828023BF}
+		{7A6EF49E-7946-4101-9C89-407B9C53A173} = {7A6EF49E-7946-4101-9C89-407B9C53A173}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
