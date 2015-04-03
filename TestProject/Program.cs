@@ -101,8 +101,11 @@ namespace TestProject
         }
 
       
-       
-
+          
+            
+            testECDF();
+            Console.ReadLine();
+        }
 
         private class myob : IObserver<int>
         {
@@ -316,7 +319,21 @@ namespace TestProject
             subscription.Dispose();
         }
 
-        
+        public static void testECDF()
+        {
+            Random rand = new Random();
+            var result = Observable.Range(0, 10).Select((_) => rand.Next(3) + rand.Next(3)).ECDF();
+            result.Subscribe((ecdf) => {
+                Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
+                foreach(var kv in ecdf)
+                {
+                    Console.WriteLine("{0},{1}", kv.Key, kv.Value);
+                }
+                Console.WriteLine("{0} pairs printed!", ecdf.Count);
+                Console.WriteLine();
+            });
+            Console.WriteLine("Test is done!");
+        }
     }
 
 

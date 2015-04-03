@@ -1,4 +1,7 @@
-﻿
+﻿我看了你写的伪代码，距离实现差距比较大，有一些关键点是有问题的。因此我给你写一下框架和接口你来实现。
+
+
+
 (一) Before seeing the pseudocode we need to define a new class to store our returned data.
 
 public class  DataItem{
