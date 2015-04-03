@@ -331,6 +331,7 @@ namespace TestProject
                     Console.WriteLine("{0},{1}", kv.Key, kv.Value);
                 }
                 Console.WriteLine("{0} pairs printed!", ecdf.Count);
+                Console.WriteLine();
             });
             Console.WriteLine("Test is done!");
         }
