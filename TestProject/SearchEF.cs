@@ -23,8 +23,8 @@ namespace TestProject
         public static IObservable<随机变量值域> ICDF<随机变量值域, TResult>(this IObservable<TResult> searchSource, IDictionary<随机变量值域, TResult> dict)
         {
             return new ICDF<随机变量值域, TResult>(searchSource,dict);
-        }
-        
+   }
+
 
    }
 
@@ -38,6 +38,7 @@ namespace TestProject
         {
             _source = source;
             _searchSource = searchSource;
+            //需要订阅并不断更新最新数据表而不是获得一个静态的。
             _dict = getDictionary();
         }
 
