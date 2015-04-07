@@ -16,23 +16,34 @@ namespace TestProject
             return new CDF<随机变量值域, TResult>(source, searchSource);
         }
 
+        public static IObservable<TResult> CDF<随机变量值域, TResult>(this IObservable<随机变量值域> searchSource, IDictionary<随机变量值域, TResult> source) {
+            return new CDF<随机变量值域, TResult>(source, searchSource);
+        }
    }
 
     public class CDF<随机变量值域, TResult> : Producer<TResult>
     {
         private readonly IObservable<IDictionary<随机变量值域, TResult>> _source;
         private readonly IObservable<随机变量值域> _searchSource;
+        private IDictionary<随机变量值域, TResult> _dict;
 
         public CDF(IObservable<IDictionary<随机变量值域, TResult>> source, IObservable<随机变量值域> searchSource)
         {
             _source = source;
             _searchSource = searchSource;
+            _dict = getDictionary();
         }
 
+        public CDF(IDictionary<随机变量值域, TResult> dict, IObservable<随机变量值域> searchSource)
+        {
+            _dict = dict;
+            _searchSource = searchSource;
+        }
+       
         protected override IDisposable Run(IObserver<TResult> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
-            var dictioanry = getDictionary();
-            var sink = new CDF_sink(observer, cancel, dictioanry);
+
+            var sink = new CDF_sink(observer, cancel, _dict);
             setSink(sink);
             return _searchSource.SubscribeSafe(sink);
         }
