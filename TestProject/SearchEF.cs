@@ -19,6 +19,13 @@ namespace TestProject
         public static IObservable<TResult> CDF<随机变量值域, TResult>(this IObservable<随机变量值域> searchSource, IDictionary<随机变量值域, TResult> source) {
             return new CDF<随机变量值域, TResult>(source, searchSource);
         }
+
+        public static IObservable<随机变量值域> ICDF<随机变量值域, TResult>(this IObservable<TResult> searchSource, IDictionary<随机变量值域, TResult> dict)
+        {
+            return new ICDF<随机变量值域, TResult>(searchSource,dict);
+        }
+        
+
    }
 
     public class CDF<随机变量值域, TResult> : Producer<TResult>
@@ -54,9 +61,13 @@ namespace TestProject
             if (_source == null) throw new ArgumentNullException("source");
             var dict = default(IDictionary<随机变量值域, TResult>);
             dict = _source.LastOrDefault();
-            // Errors!! Empty!! 
-            // There the program will never stop!!??? why
-            Console.WriteLine(dict.Keys);
+            var value = default(TResult);
+            //foreach (var item in dict.Keys)
+            //{
+            //    dict.TryGetValue(item, out value);
+            //    Console.WriteLine("The keys are: " + item + " value:"+ value);
+            //}
+            
             return dict;
         }
 
@@ -110,6 +121,83 @@ namespace TestProject
         }
 
     }
+
+
+
+
+    public class ICDF<随机变量值域, TResult> : Producer<随机变量值域> {
+       
+        private readonly IObservable<IDictionary<随机变量值域, TResult>> _source;
+        private readonly IObservable<TResult> _searchSource;
+        private IDictionary<随机变量值域, TResult> _dict;
+
+        public ICDF(IObservable<TResult> searchSource, IDictionary<随机变量值域, TResult> dict)
+        {
+            _searchSource = searchSource;
+            _dict = dict;
+        }
+
+        protected override IDisposable Run(IObserver<随机变量值域> observer, IDisposable cancel, Action<IDisposable> setSink)
+        {
+            var sink = new ICDF_sink(observer, cancel, _dict);
+            setSink(sink);
+            return _searchSource.SubscribeSafe(sink);
+        }
+
+        class ICDF_sink : Sink<随机变量值域>, IObserver<TResult> 
+        {
+            private IDictionary<随机变量值域, TResult> _dictionary;
+            public ICDF_sink(IObserver<随机变量值域> observer, IDisposable cancel, IDictionary<随机变量值域, TResult> dict)
+                :base(observer,cancel)
+            {
+                _dictionary = dict;
+            }
+
+            public void OnNext(TResult value)
+            {
+
+                var keyValue = getICDFvalue(value);
+                base._observer.OnNext(keyValue);
+
+            }
+
+            // The core code of ICDF 
+            // In this part we can get certain 随机变量值域 value according to the probility sequence.
+            private 随机变量值域 getICDFvalue(TResult value)
+            {
+               // There we apply some algorithm to implement the search function.
+                var returnvalue = default(随机变量值域);
+                var probility=default(TResult);
+                foreach(var item in _dictionary.Keys)
+                {
+                    _dictionary.TryGetValue(item,out probility);
+                    var comparer = Comparer<TResult>.Default;
+;
+
+                if (comparer.Compare(value, probility) <= 0)
+                    {
+                        returnvalue = item;
+                    }
+                }
+                return returnvalue;
+            }
+
+            public void OnError(Exception error)
+            {
+                base._observer.OnError(error);
+                base.Dispose();
+            }
+
+            public void OnCompleted()
+            {
+                base._observer.OnCompleted();
+                base.Dispose();
+            }
+        }
+
+    }
+
+
 
 
     }

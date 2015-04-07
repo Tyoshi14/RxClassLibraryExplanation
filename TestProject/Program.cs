@@ -319,7 +319,7 @@ namespace TestProject
         public static void testECDF()
         {
             Random rand = new Random();
-            var result = Observable.Range(0, 10).Select((_) => rand.Next(5) + rand.Next(5)).ECDF();
+            var result = Observable.Range(0,10).Select((_) => rand.Next(5) + rand.Next(5)).ECDF();
             //result.Subscribe((ecdf) => {
             //    Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
             //    foreach(var kv in ecdf)
@@ -339,8 +339,13 @@ namespace TestProject
             //dict.Add(6, 0.7);
 
             //var result=Observable.Repeat(dict);
+
             var dict = result.Last();
-            var test = Observable.Range(1, 10).CDF<int, double>(dict);
+            foreach (var kv in dict)
+                {
+                    Console.WriteLine("{0},{1}", kv.Key, kv.Value);
+                }
+            var test = Observable.Repeat(1.0,1).ICDF<int, double>(dict);
             test.Subscribe(x => Console.WriteLine(x));
         }
     }
