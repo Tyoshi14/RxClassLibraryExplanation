@@ -31,6 +31,7 @@ namespace TestProject
         {
             _source = source;
             _searchSource = searchSource;
+            //需要订阅并不断更新最新数据表而不是获得一个静态的。
             _dict = getDictionary();
         }
 
