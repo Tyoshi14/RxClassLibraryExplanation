@@ -96,15 +96,12 @@ namespace TestProject
 
             // There begin the function to get the empircial distribution.
 
+           
 
+           testECDF();
             Console.ReadLine();
-        }
 
-      
           
-            
-            testECDF();
-            Console.ReadLine();
         }
 
         private class myob : IObserver<int>
@@ -321,18 +318,28 @@ namespace TestProject
 
         public static void testECDF()
         {
-            Random rand = new Random();
-            var result = Observable.Range(0, 10).Select((_) => rand.Next(3) + rand.Next(3)).ECDF();
-            result.Subscribe((ecdf) => {
-                Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
-                foreach(var kv in ecdf)
-                {
-                    Console.WriteLine("{0},{1}", kv.Key, kv.Value);
-                }
-                Console.WriteLine("{0} pairs printed!", ecdf.Count);
-                Console.WriteLine();
-            });
-            Console.WriteLine("Test is done!");
+            //Random rand = new Random();
+            //var result = Observable.Range(0, 10).Select((_) => rand.Next(5) + rand.Next(5)).ECDF();
+            //result.Subscribe((ecdf) => {
+            //    Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
+            //    foreach(var kv in ecdf)
+            //    {
+            //        Console.WriteLine("{0},{1}", kv.Key, kv.Value);
+            //    }
+            //    Console.WriteLine("{0} pairs printed!", ecdf.Count);
+            //    Console.WriteLine();
+            //});
+            var dict=new Dictionary<int,double>();
+            dict.Add(1,0.2);
+            dict.Add(2, 0.3);
+            dict.Add(3, 0.4);
+            dict.Add(4, 0.5);
+            dict.Add(5, 0.6);
+            dict.Add(6, 0.7);
+
+            var result=Observable.Repeat(dict);
+            var test = Observable.Range(1, 10).CDF<int,double>(result);
+            test.Subscribe(x => Console.WriteLine(x));
         }
     }
 

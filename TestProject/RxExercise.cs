@@ -94,8 +94,16 @@ namespace TestProject
             }
             );
 
+            IDisposable subscription = ob.Subscribe(i => Console.WriteLine(i));
+            Console.WriteLine("Press any key to cancel");
+            Console.ReadKey();
+            subscription.Dispose();
+            Console.WriteLine("Press any key to quit");
+            Console.ReadKey();  // give background thread chance to write the cancel acknowledge message
+
         }
 
 
+      
     }
 }

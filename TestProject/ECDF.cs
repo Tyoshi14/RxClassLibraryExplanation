@@ -48,6 +48,7 @@ namespace TestProject
         {
             throw new NotImplementedException();
         }
+
         //TO-DO:
         /// <summary>
         /// 不改变分布的情况下将额外的查询数据流转换为分位数值流
@@ -58,6 +59,7 @@ namespace TestProject
         {
             throw new NotImplementedException();
         }
+
         class 内部处理器 : Sink<IDictionary<随机变量值域, double>>, IObserver<随机变量值域>
         {
             private int _总样本数;
@@ -75,6 +77,7 @@ namespace TestProject
             //每次OnNext被调用都要处理Nlog(N)复杂性，其中N是已经存在的随机变量不同取值数
             public void OnNext(随机变量值域 随机变量新观测值)
             {
+               
                 _总样本数++;
                 if(_观测值频次统计表.ContainsKey(随机变量新观测值))
                     _观测值频次统计表[随机变量新观测值]++;
@@ -86,6 +89,7 @@ namespace TestProject
                     count += _观测值频次统计表[key];
                     _观测值累计概率统计表[key] = (double)count / _总样本数;
                 }
+
                 base._observer.OnNext(new Dictionary<随机变量值域, double>(_观测值累计概率统计表));
             }
             public void OnError(Exception error)
