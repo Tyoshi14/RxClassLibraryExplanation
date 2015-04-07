@@ -32,14 +32,14 @@ namespace TestProject
     {
         private readonly IObservable<IDictionary<随机变量值域, TResult>> _source;
         private readonly IObservable<随机变量值域> _searchSource;
-        private IDictionary<随机变量值域, TResult> _dict;
+        private volatile IDictionary<随机变量值域, TResult> _dict;
 
         public CDF(IObservable<IDictionary<随机变量值域, TResult>> source, IObservable<随机变量值域> searchSource)
         {
             _source = source;
             _searchSource = searchSource;
             //需要订阅并不断更新最新数据表而不是获得一个静态的。
-            _dict = getDictionary();
+            source.Subscribe((dict) => _dict = dict);
         }
 
         public CDF(IDictionary<随机变量值域, TResult> dict, IObservable<随机变量值域> searchSource)
@@ -56,21 +56,6 @@ namespace TestProject
             return _searchSource.SubscribeSafe(sink);
         }
 
-        // Get the lastest dictioanry we used to get the probability.
-        private IDictionary<随机变量值域, TResult> getDictionary()
-        {
-            if (_source == null) throw new ArgumentNullException("source");
-            var dict = default(IDictionary<随机变量值域, TResult>);
-            dict = _source.LastOrDefault();
-            var value = default(TResult);
-            //foreach (var item in dict.Keys)
-            //{
-            //    dict.TryGetValue(item, out value);
-            //    Console.WriteLine("The keys are: " + item + " value:"+ value);
-            //}
-            
-            return dict;
-        }
 
 
         class CDF_sink : Sink<TResult>, IObserver<随机变量值域>
