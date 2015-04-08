@@ -9,41 +9,42 @@ using System.Threading.Tasks;
 
 namespace TestProject
 {
-    public  static class  SearchEF
+    public static class SearchEF
     {
         // Seach for probility
-        public static IObservable<TResult> CDF<随机变量值域, TResult>(this IObservable<随机变量值域> searchSource, IObservable<IDictionary<随机变量值域, TResult>> source)
+        public static IObservable<double> CDF<随机变量值域>(this IObservable<随机变量值域> searchSource, IObservable<IDictionary<随机变量值域, double>> source)
         {
-            return new CDF<随机变量值域, TResult>(source, searchSource, Comparer<随机变量值域>.Default);
+            return new CDF<随机变量值域>(source, searchSource, Comparer<随机变量值域>.Default);
         }
 
-        public static IObservable<TResult> CDF<随机变量值域, TResult>(this IObservable<随机变量值域> searchSource, IDictionary<随机变量值域, TResult> source) {
-            return new CDF<随机变量值域, TResult>(source, searchSource, Comparer<随机变量值域>.Default);
+        public static IObservable<double> CDF<随机变量值域>(this IObservable<随机变量值域> searchSource, IDictionary<随机变量值域, double> source)
+        {
+            return new CDF<随机变量值域>(source, searchSource, Comparer<随机变量值域>.Default);
         }
 
         // Search objects according to probility
-        public static IObservable<随机变量值域> ICDF<随机变量值域, TResult>(this IObservable<TResult> searchSource, IDictionary<随机变量值域, TResult> dict)
+        public static IObservable<随机变量值域> ICDF<随机变量值域>(this IObservable<double> searchSource, IDictionary<随机变量值域, double> dict)
         {
-            return new ICDF<随机变量值域, TResult>(searchSource, dict, Comparer<TResult>.Default);
+            return new ICDF<随机变量值域>(searchSource, dict, Comparer<double>.Default);
         }
 
-        public static IObservable<随机变量值域> ICDF<随机变量值域, TResult>(this IObservable<TResult> searchSource, IObservable<IDictionary<随机变量值域, TResult>> dictSource)
+        public static IObservable<随机变量值域> ICDF<随机变量值域>(this IObservable<double> searchSource, IObservable<IDictionary<随机变量值域, double>> dictSource)
         {
-            return new ICDF<随机变量值域, TResult>(searchSource, dictSource,Comparer<TResult>.Default);
+            return new ICDF<随机变量值域>(searchSource, dictSource, Comparer<double>.Default);
         }
 
-   }
+    }
 
-    public class CDF<随机变量值域, TResult> : Producer<TResult>
+    public class CDF<随机变量值域> : Producer<double>
     {
-       
+
         private readonly IObservable<随机变量值域> _searchSource;
-        private volatile IDictionary<随机变量值域, TResult> _dict;
+        private volatile IDictionary<随机变量值域, double> _dict;
         private readonly IComparer<随机变量值域> _comparer;
 
-        public CDF(IObservable<IDictionary<随机变量值域, TResult>> dictSource, IObservable<随机变量值域> searchSource, IComparer<随机变量值域> comparer)
+        public CDF(IObservable<IDictionary<随机变量值域, double>> dictSource, IObservable<随机变量值域> searchSource, IComparer<随机变量值域> comparer)
         {
-           
+
             _searchSource = searchSource;
             //需要订阅并不断更新最新数据表而不是获得一个静态的。
             // There we can get the latest dictionary!
@@ -51,14 +52,14 @@ namespace TestProject
             _comparer = comparer;
         }
 
-        public CDF(IDictionary<随机变量值域, TResult> dict, IObservable<随机变量值域> searchSource,IComparer<随机变量值域> comparer)
+        public CDF(IDictionary<随机变量值域, double> dict, IObservable<随机变量值域> searchSource, IComparer<随机变量值域> comparer)
         {
             _dict = dict;
             _searchSource = searchSource;
             _comparer = comparer;
         }
-       
-        protected override IDisposable Run(IObserver<TResult> observer, IDisposable cancel, Action<IDisposable> setSink)
+
+        protected override IDisposable Run(IObserver<double> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
 
             var sink = new CDF_sink(observer, cancel, _dict, _comparer);
@@ -68,18 +69,18 @@ namespace TestProject
 
 
 
-        class CDF_sink : Sink<TResult>, IObserver<随机变量值域>
+        class CDF_sink : Sink<double>, IObserver<随机变量值域>
         {
-            private IDictionary<随机变量值域, TResult> dictionary;
+            private IDictionary<随机变量值域, double> dictionary;
             private IComparer<随机变量值域> comparer;
-            public CDF_sink(IObserver<TResult> observer, IDisposable cancel, IDictionary<随机变量值域, TResult> dict,IComparer<随机变量值域> comp)
+            public CDF_sink(IObserver<double> observer, IDisposable cancel, IDictionary<随机变量值域, double> dict, IComparer<随机变量值域> comp)
                 : base(observer, cancel)
             {
                 dictionary = dict;
                 comparer = comp;
             }
 
-            
+
             public void OnNext(随机变量值域 value)
             {
 
@@ -91,20 +92,20 @@ namespace TestProject
             /// <summary>
             /// Get the probility of the certain value.
             /// </summary>
-            private TResult getProbility(随机变量值域 value)
+            private double getProbility(随机变量值域 value)
             {
-                TResult result = default(TResult);
+                double result = default(double);
                 随机变量值域 fommer = default(随机变量值域);
                 随机变量值域 latter = default(随机变量值域);
-                foreach (var item in dictionary.Keys)
+                foreach(var item in dictionary.Keys)
                 {
-                    if (dictionary.Keys.Contains(item))
+                    if(dictionary.Keys.Contains(item))
                     {
-                        dictionary.TryGetValue(item,out result);
+                        dictionary.TryGetValue(item, out result);
                         return result;
                     }
 
-                    if (comparer.Compare(item, value) > 0)
+                    if(comparer.Compare(item, value) > 0)
                     {
                         latter = item;
                         break;
@@ -116,19 +117,19 @@ namespace TestProject
                 return result;
             }
 
-            private TResult calculateProbability(随机变量值域 former,随机变量值域 latter,随机变量值域 value) 
+            private double calculateProbability(随机变量值域 former, 随机变量值域 latter, 随机变量值域 value)
             {
-                var _former = default(TResult);
-                var _latter = default(TResult);
-                dictionary.TryGetValue(former,out _former);
+                var _former = default(double);
+                var _latter = default(double);
+                dictionary.TryGetValue(former, out _former);
                 dictionary.TryGetValue(latter, out _latter);
 
-              // There  I have some problems. For the reason that I cant convert TResult and another type to types that can calculate, for example Int double or float and so on!!!
-              // So how should I coculate the Probility???
-              // Now I only return the former object which is smaller than the passed parameter value!!!
+                // There  I have some problems. For the reason that I cant convert double and another type to types that can calculate, for example Int double or float and so on!!!
+                // So how should I coculate the Probility???
+                // Now I only return the former object which is smaller than the passed parameter value!!!
                 return _former;
             }
-          
+
             public void OnError(Exception error)
             {
                 base._observer.OnError(error);
@@ -148,26 +149,27 @@ namespace TestProject
 
 
 
-    public class ICDF<随机变量值域, TResult> : Producer<随机变量值域> {
-       
-        private readonly IObservable<TResult> _searchSource;
-        private readonly IComparer<TResult> _comparer;
-        private volatile IDictionary<随机变量值域, TResult> _dict;
+    public class ICDF<随机变量值域> : Producer<随机变量值域>
+    {
 
-        public ICDF(IObservable<TResult> searchSource, IDictionary<随机变量值域, TResult> dict, IComparer<TResult> comparer)
+        private readonly IObservable<double> _searchSource;
+        private readonly IComparer<double> _comparer;
+        private volatile IDictionary<随机变量值域, double> _dict;
+
+        public ICDF(IObservable<double> searchSource, IDictionary<随机变量值域, double> dict, IComparer<double> comparer)
         {
             _searchSource = searchSource;
             _dict = dict;
             _comparer = comparer;
-            
+
         }
 
-        public ICDF(IObservable<TResult> searchSource, IObservable<IDictionary<随机变量值域, TResult>> dictSource,IComparer<TResult> comparer)
+        public ICDF(IObservable<double> searchSource, IObservable<IDictionary<随机变量值域, double>> dictSource, IComparer<double> comparer)
         {
             _searchSource = searchSource;
             _comparer = comparer;
             dictSource.Subscribe((dict) => _dict = dict);
-            
+
         }
         protected override IDisposable Run(IObserver<随机变量值域> observer, IDisposable cancel, Action<IDisposable> setSink)
         {
@@ -176,19 +178,19 @@ namespace TestProject
             return _searchSource.SubscribeSafe(sink);
         }
 
-        class ICDF_sink : Sink<随机变量值域>, IObserver<TResult> 
+        class ICDF_sink : Sink<随机变量值域>, IObserver<double>
         {
-            private IDictionary<随机变量值域, TResult> _dictionary;
-            private readonly IComparer<TResult> _comparer;
+            private IDictionary<随机变量值域, double> _dictionary;
+            private readonly IComparer<double> _comparer;
 
-            public ICDF_sink(IObserver<随机变量值域> observer, IDisposable cancel, IDictionary<随机变量值域, TResult> dict, IComparer<TResult> comparer)
-                :base(observer,cancel)
+            public ICDF_sink(IObserver<随机变量值域> observer, IDisposable cancel, IDictionary<随机变量值域, double> dict, IComparer<double> comparer)
+                : base(observer, cancel)
             {
                 _dictionary = dict;
                 _comparer = comparer;
             }
 
-            public void OnNext(TResult value)
+            public void OnNext(double value)
             {
 
                 var keyValue = getICDFvalue(value);
@@ -198,18 +200,18 @@ namespace TestProject
 
             // The core code of ICDF 
             // In this part we can get certain 随机变量值域 value according to the probility sequence.
-            private 随机变量值域 getICDFvalue(TResult value)
+            private 随机变量值域 getICDFvalue(double value)
             {
-               // There we apply some algorithm to implement the search function.
+                // There we apply some algorithm to implement the search function.
                 var returnvalue = default(随机变量值域);
-                var probility=default(TResult);
+                var probility = default(double);
                 foreach(var item in _dictionary.Keys)
                 {
-                    _dictionary.TryGetValue(item,out probility);
-                    if (_comparer.Compare(value, probility) <= 0)
-                        {
-                            returnvalue = item;
-                        }
+                    _dictionary.TryGetValue(item, out probility);
+                    if(_comparer.Compare(value, probility) <= 0)
+                    {
+                        returnvalue = item;
+                    }
                 }
                 return returnvalue;
             }
@@ -232,5 +234,5 @@ namespace TestProject
 
 
 
-    }
+}
 
