@@ -318,35 +318,35 @@ namespace TestProject
 
         public static void testECDF()
         {
+            // Note that when you test these code, you will find different results.
+            // It seems that we use the same variable result and will certainly get the same execition number, but this will never happen because 
+            // of the lazy evaluaion of C# and Rx. The variable you use each time is new and generated immediately!
             Random rand = new Random();
             var result = Observable.Range(0,10).Select((_) => rand.Next(5) + rand.Next(5)).ECDF();
-            //result.Subscribe((ecdf) => {
-            //    Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
-            //    foreach(var kv in ecdf)
-            //    {
-            //        Console.WriteLine("{0},{1}", kv.Key, kv.Value);
-            //    }
-            //    Console.WriteLine("{0} pairs printed!", ecdf.Count);
-            //    Console.WriteLine();
-            //});
-
-            //var dict=new Dictionary<int,double>();
-            //dict.Add(1,0.2);
-            //dict.Add(2, 0.3);
-            //dict.Add(3, 0.4);
-            //dict.Add(4, 0.5);
-            //dict.Add(5, 0.6);
-            //dict.Add(6, 0.7);
-
-            //var result=Observable.Repeat(dict);
-
-            var dict = result.Last();
-            foreach (var kv in dict)
+            result.Subscribe((ecdf) =>
+            {
+                Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
+                foreach (var kv in ecdf)
                 {
                     Console.WriteLine("{0},{1}", kv.Key, kv.Value);
                 }
-            var test = Observable.Repeat(1.0,1).ICDF<int, double>(dict);
-            test.Subscribe(x => Console.WriteLine(x));
+                Console.WriteLine("{0} pairs printed!", ecdf.Count);
+                Console.WriteLine();
+            });
+
+           
+
+            var dict = result.Last();
+            foreach (var kv in dict)
+            {
+                Console.WriteLine("{0},{1}", kv.Key, kv.Value);
+            }
+
+            var test = Observable.Repeat(1.0,1).ICDF<int, double>(result);
+            var test1 = Observable.Repeat(1.0, 1).ICDF<int, double>(dict);
+           // var test = Observable.Range(0, 10).CDF<int, double>(result);
+            test.Subscribe(x => Console.WriteLine("Observable反向查询结果为： "+x));
+            test1.Subscribe(x => Console.WriteLine("Dictioanry反向查询结果为： " + x));
         }
     }
 
