@@ -109,13 +109,14 @@ namespace TestProject
                     return result;
                 }
 
+                if (comparer.Compare(dictionary.Last().Key,value)<0)
+                {
+                    return 1.0;
+                }
+
                 foreach(var item in dictionary.Keys)
                 {
-                    if (dictionary.Last().Key.Equals(item))
-                    {
-                        return 1.0;
-                    }
-
+                    
                     if(comparer.Compare(item, value) > 0)
                     {
                         latter = item;
