@@ -78,6 +78,10 @@ namespace TestProject
             {
                 dictionary = dict;
                 comparer = comp;
+                foreach (var kv in dict)
+                {
+                    Console.WriteLine("{0},{1}", kv.Key, kv.Value);
+                }
             }
 
 
@@ -97,12 +101,19 @@ namespace TestProject
                 double result = default(double);
                 随机变量值域 fommer = default(随机变量值域);
                 随机变量值域 latter = default(随机变量值域);
+
+                if (dictionary.Keys.Contains(value))
+                {
+                    dictionary.TryGetValue(value, out result);
+                    //Console.WriteLine("Contains value {0} result {1}", value, result);
+                    return result;
+                }
+
                 foreach(var item in dictionary.Keys)
                 {
-                    if(dictionary.Keys.Contains(item))
+                    if (dictionary.Last().Key.Equals(item))
                     {
-                        dictionary.TryGetValue(item, out result);
-                        return result;
+                        return 1.0;
                     }
 
                     if(comparer.Compare(item, value) > 0)
@@ -112,8 +123,8 @@ namespace TestProject
                     }
                     fommer = item;
                 }
-
                 result = calculateProbability(fommer, latter, value);
+              
                 return result;
             }
 
@@ -121,13 +132,27 @@ namespace TestProject
             {
                 var _former = default(double);
                 var _latter = default(double);
+                var result = default(double);
+
                 dictionary.TryGetValue(former, out _former);
                 dictionary.TryGetValue(latter, out _latter);
+              
+                if (value is int|| value is double|| value is float || value is decimal)
+                {
+                    double _fObject = Convert.ToDouble(former);
+                    double _LObject = Convert.ToDouble(latter);
+                    double k = (double)((_latter - _former) / (_LObject - _fObject));
+                    double b = _latter - k * _LObject;
+                    result = k * Convert.ToDouble(value) + b;
+                    //Console.WriteLine("value {0} K {1}, b {2} result {3}",value,k,b,result);
+                }
+                else {
+                    result =(double) ((_former + _latter) / 2);
+                    //Console.WriteLine("value {0} result {1}",value, result);
+                }
 
-                // There  I have some problems. For the reason that I cant convert double and another type to types that can calculate, for example Int double or float and so on!!!
-                // So how should I coculate the Probility???
-                // Now I only return the former object which is smaller than the passed parameter value!!!
-                return _former;
+
+                return result;
             }
 
             public void OnError(Exception error)
@@ -203,6 +228,8 @@ namespace TestProject
             private 随机变量值域 getICDFvalue(double value)
             {
                 // There we apply some algorithm to implement the search function.
+                // The principle there is that we return the last object  whose probility  is smaller than the target object value.
+                // Otherwise we return the default values.
                 var returnvalue = default(随机变量值域);
                 var probility = default(double);
                 foreach(var item in _dictionary.Keys)

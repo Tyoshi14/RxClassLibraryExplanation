@@ -323,30 +323,32 @@ namespace TestProject
             // of the lazy evaluaion of C# and Rx. The variable you use each time is new and generated immediately!
             Random rand = new Random();
             var result = Observable.Range(0,10).Select((_) => rand.Next(5) + rand.Next(5)).ECDF();
-            result.Subscribe((ecdf) =>
-            {
-                Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
-                foreach (var kv in ecdf)
-                {
-                    Console.WriteLine("{0},{1}", kv.Key, kv.Value);
-                }
-                Console.WriteLine("{0} pairs printed!", ecdf.Count);
-                Console.WriteLine();
-            });
+            //result.Subscribe((ecdf) =>
+            //{
+            //    Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
+            //    foreach (var kv in ecdf)
+            //    {
+            //        Console.WriteLine("{0},{1}", kv.Key, kv.Value);
+            //    }
+            //    Console.WriteLine("{0} pairs printed!", ecdf.Count);
+            //    Console.WriteLine();
+            //});
 
+            var test = Observable.Range(0, 10).CDF<int>(result);
+            test.Subscribe(x => Console.WriteLine("IObservable正向查询结果为： " + x));
+
+
+            //var dict = result.Last();
+            //foreach (var kv in dict)
+            //{
+            //    Console.WriteLine("{0},{1}", kv.Key, kv.Value);
+            //}
+
+            //var test = Observable.Repeat(1.0,1).ICDF<int>(result);
+            //var test1 = Observable.Repeat(1.0, 1).ICDF<int>(dict);
            
-
-            var dict = result.Last();
-            foreach (var kv in dict)
-            {
-                Console.WriteLine("{0},{1}", kv.Key, kv.Value);
-            }
-
-            var test = Observable.Repeat(1.0,1).ICDF<int, double>(result);
-            var test1 = Observable.Repeat(1.0, 1).ICDF<int, double>(dict);
-           // var test = Observable.Range(0, 10).CDF<int, double>(result);
-            test.Subscribe(x => Console.WriteLine("Observable反向查询结果为： "+x));
-            test1.Subscribe(x => Console.WriteLine("Dictioanry反向查询结果为： " + x));
+            //test.Subscribe(x => Console.WriteLine("Observable反向查询结果为： "+x));
+            //test1.Subscribe(x => Console.WriteLine("Dictioanry反向查询结果为： " + x));
         }
     }
 
