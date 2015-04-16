@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CDFTree.cs" />
     <Compile Include="ECDF.cs" />
     <Compile Include="IEnumerableExtension.cs" />
     <Compile Include="MoveAverage.cs" />
