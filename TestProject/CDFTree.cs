@@ -139,11 +139,16 @@ namespace TestProject
         {
             if(root == null)
                 throw new NotSupportedException();
-            double k = ((double)node.CountLeft + node.CountThis) / node.Count;
+            double k = (double)node.CountLessAndEqual / SampleSize;
             if(p < k && node.Left != null)
                 return ICDFHelper(node.Left, p);
-            if(p > k && node.Right != null)
-                return ICDFHelper(node.Right, p);
+            if(p > k)
+            {
+                if(node.Right != null)
+                    return ICDFHelper(node.Right, p);
+                if(node.Parent != null && node.Parent.Left == node)
+                    return node.Parent.Key;
+            }
             return node.Key;
         }
         internal ulong FrequencyHelper(Node node, T value)
