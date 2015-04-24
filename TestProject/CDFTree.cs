@@ -117,14 +117,43 @@ namespace TestProject
         //这样通过比较字符串就可以直接比较树结构，非常方面，输出也比较直观
         public static string Serielize(CDFTree<T> tree, Func<T, string> toString)
         {
-            throw new NotImplementedException();
+            return serielizeHelper(tree.root, toString).Item1;
+        }
+        private static Tuple<string, bool> serielizeHelper(Node node, Func<T, string> toString)
+        {
+            Tuple<string, bool> left = null;
+            Tuple<string, bool> right = null;
+            if(node == null)
+                return Tuple.Create("", true);
+            if(node.Left == null && node.Right == null)
+                return Tuple.Create(toString(node.Key), true);
+            if(node.Left == null && node.Right != null)
+                return Tuple.Create(toString(node.Key) + "(" + serielizeHelper(node.Right, toString).Item1 + ")", false);
+            if(node.Left != null && node.Right == null)
+                return Tuple.Create("(" + serielizeHelper(node.Left, toString).Item1 + ")" + toString(node.Key), false);
+            left = serielizeHelper(node.Left, toString);
+            right = serielizeHelper(node.Right, toString);
+            string result = "";
+            if(left.Item2)
+                result += left.Item1;
+            else
+                result += "(" + left.Item1 + ")";
+            result += toString(node.Key);
+            if(right.Item2)
+                result += right.Item1;
+            else
+                result += "(" + right.Item1 + ")";
+            return Tuple.Create(result, false);
         }
 
-
         //利用插入顺序表示构造树
-        public static CDFTree<string> Create(string input)
+        public static CDFTree<char> Create(string input)
         {
-            throw new NotImplementedException();
+            var result = new CDFTree<char>();
+            foreach(var k in input)
+                if(k >= 'A' && k <= 'Z')
+                    result.Add(k);
+            return result;
         }
 
         public List<T> getTreeInOrderWalk()

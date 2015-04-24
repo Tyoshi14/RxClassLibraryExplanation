@@ -15,6 +15,7 @@ namespace TestProject
 
         static void Main(string[] args)
         {
+
             //var mySeries = new SortedList<DateTime, double>();
             //mySeries.Add(new DateTime(2011, 01, 1), 10);
             //mySeries.Add(new DateTime(2011, 01, 2), 25);
@@ -101,43 +102,74 @@ namespace TestProject
             // testECDF();
 
             // Use the extend data structure to get CDF.
-            CDFTree<int> tree = new CDFTree<int>();
-            int[] array = { 3, 10, 7, 8, 18, 11, 22, 2, 1, 15, 14, 33 };
-            for(int i = 0; i < array.Length; i++)
-            {
-                tree.Add(array[i], 1);
-            }
+            ////CDFTree<int> tree = new CDFTree<int>();
+            ////int[] array = { 3, 10, 7, 8, 18, 11, 22, 2, 1, 15, 14, 33 };
+            ////for(int i = 0; i < array.Length; i++)
+            ////{
+            ////    tree.Add(array[i], 1);
+            ////}
 
-            var element = tree.getTreeInOrderWalk();
-            foreach(var elem in element)
-            {
-                Console.Write(elem + " ");
-            }
-            Console.WriteLine();
+            ////var element = tree.getTreeInOrderWalk();
+            ////foreach(var elem in element)
+            ////{
+            ////    Console.Write(elem + " ");
+            ////}
+            ////Console.WriteLine();
 
 
-            var list = tree.getTreeInLayer();
-            int colum = 0;
-            Console.WriteLine("Root");
-            foreach(var item in list)
-            {
-                if(item.key == default(int))
-                {
-                    Console.WriteLine("Column {0}", ++colum);
-                }
-                else if(item.isRed)
-                {
-                    Console.WriteLine("   " + item.key + " Red");
-                }
-                else
-                {
-                    Console.WriteLine("   " + item.key + " Black");
-                }
-            }
+            ////var list = tree.getTreeInLayer();
+            ////int colum = 0;
+            ////Console.WriteLine("Root");
+            ////foreach(var item in list)
+            ////{
+            ////    if(item.key == default(int))
+            ////    {
+            ////        Console.WriteLine("Column {0}", ++colum);
+            ////    }
+            ////    else if(item.isRed)
+            ////    {
+            ////        Console.WriteLine("   " + item.key + " Red");
+            ////    }
+            ////    else
+            ////    {
+            ////        Console.WriteLine("   " + item.key + " Black");
+            ////    }
+            ////}
+
+            ////Console.ReadLine();
+
+            ////TestCDFTree("", "");
+            TestCDFTree("A", "A");
+            TestCDFTree("A+B", "A(B)");
+            TestCDFTree("B+A", "(A)B");
+            TestCDFTree("D[BF][ACEG]", "(ABC)D(EFG)");
+            TestCDFTree("B[AD][CF][EG]", "(ABC)D(EFG)");
+            TestCDFTree("F[DG][BE][AC]", "(ABC)D(EFG)");
+            TestCDFTree("B[AF][DG][CE]", "(ABC)D(EFG)");
+            TestCDFTree("F[BG][AD][CE]", "(ABC)D(EFG)");
 
             Console.ReadLine();
 
+        }
 
+        private static void TestCDFTree(string testInput, string expectedOutput)
+        {
+            Console.WriteLine("Testing: {0}", testInput);
+            Console.WriteLine("Expecting: {0}", expectedOutput);
+            string testOutput = CDFTree<char>.Serielize(CDFTree<char>.Create(testInput), k => k.ToString());
+            Console.WriteLine("Get: {0}", testOutput);
+            if(testOutput.Equals(expectedOutput))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Pass!");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Fail!");
+            }
+            Console.ResetColor();
+            Console.WriteLine();
         }
 
         private class myob : IObserver<int>
