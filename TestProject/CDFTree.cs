@@ -121,24 +121,25 @@ namespace TestProject
         }
         private static Tuple<string, bool> serielizeHelper(Node node, Func<T, string> toString)
         {
-            Tuple<string, bool> left = null;
-            Tuple<string, bool> right = null;
             if(node == null)
                 return Tuple.Create("", true);
+            string key = toString(node.Key);
+            if(node.IsRed)
+                key = key.ToLower();
             if(node.Left == null && node.Right == null)
-                return Tuple.Create(toString(node.Key), true);
+                return Tuple.Create(key, true);
             if(node.Left == null && node.Right != null)
-                return Tuple.Create(toString(node.Key) + "(" + serielizeHelper(node.Right, toString).Item1 + ")", false);
+                return Tuple.Create(key + "(" + serielizeHelper(node.Right, toString).Item1 + ")", false);
             if(node.Left != null && node.Right == null)
-                return Tuple.Create("(" + serielizeHelper(node.Left, toString).Item1 + ")" + toString(node.Key), false);
-            left = serielizeHelper(node.Left, toString);
-            right = serielizeHelper(node.Right, toString);
+                return Tuple.Create("(" + serielizeHelper(node.Left, toString).Item1 + ")" + key, false);
+            Tuple<string, bool> left = serielizeHelper(node.Left, toString);
+            Tuple<string, bool> right = serielizeHelper(node.Right, toString);
             string result = "";
             if(left.Item2)
                 result += left.Item1;
             else
                 result += "(" + left.Item1 + ")";
-            result += toString(node.Key);
+            result += key;
             if(right.Item2)
                 result += right.Item1;
             else
