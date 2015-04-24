@@ -65,6 +65,68 @@ namespace TestProject
         }
 
         #region + Test red-black tree +
+        //为了检验红黑树结构正确性编写了此测试伪代码
+
+        //首先约定树的简易表示方法（因为画树结构比较困难）
+        //用单个字母表示树的节点
+        //为了方便讨论，约定树节点的表示字母的顺序和树节点键值顺序相同
+        //用括号表示树的层次
+        //下面用例子解释上面的概念
+        //A，可以表示一个节点，也可以表示根节点为A的树，且A的左节点和右节点未作限制，可以为空，也可以很复杂而省略未写
+        //(A)B，可以表示根节点为B的树，且B的左节点为A
+        //A(B)，可以表示根节点为A的树，且A的右节点为B
+        //ABC，可以表示根节点为B的树，且B的左节点为A，B的右节点为C
+        //(ABC)DE的根是D，D的左节点是树ABC，D的右节点是E
+        //AB(CDE)的根是B，B的左节点是A，B的右节点是树CDE
+        //值得注意的是，这种表示方法删除括号后获得的节点序列和中序遍历结果相同
+        //另外需要注意的是如果去掉括号后的序列未按字母顺序则原树不是合法的树
+
+        //新节点插入
+        //我们这里的插入为简单搜索插入，不做平衡处理
+        //这样，给定插入顺序就应该得到确定的树结构，我们用+表示插入，用N表示空树
+        //则应当有下面的测试可以编写
+        //N+A=>A
+        //A+B=>A(B)
+        //B+A=>(A)B
+        //当连续插入且不影响输出树结构时，将连续插入且顺序可调的组用方括号括起并省略+
+        //B[AC]=>ABC
+        //B[CA]=>ABC
+        //B[AF][DG][CE]=>AB((CDE)FG)
+        //D[BF][ACEG]=>(ABC)D(EFG)
+        //不难发现，这种插入顺序的表示方法，如果每个顺序可调组我们按字母顺序列出，则整个表示和从根开始广度优先遍历的顺序相同
+
+
+
+        //左旋和右旋
+        //L()为左旋函数，输入为一个树旋转前的根节点，输出为该树左旋后的新根节点
+        //因此L(AB(CDE))=>(ABC)DE
+        //与左旋函数类似，R()为右旋函数
+        //R((ABC)DE)=>AB(CDE)
+
+        //平衡算法
+        //平衡算法的核心是要获得(ABC)D(EFG)的平衡形式
+        //L(AB(CD(EFG)))=>(ABC)D(EFG)
+        //R(((ABC)DE)FG))=>(ABC)D(EFG)
+        //L(R(AB((CDE)FG)))=>(ABC)D(EFG)
+        //R(L((AB(CDE))FG))=>(ABC)D(EFG)
+        //前两个是所谓zig-zig和zag-zag树，只需旋转一次即可平衡
+        //后两个是所谓zig-zag和zag-zig树，需要先旋转成zig-zig和zag-zag再旋转平衡
+
+        //按上面的方法表示树，节点字母用toString函数获得
+        //测试时T可以直接为string，即用字母作为键值
+        //这样通过比较字符串就可以直接比较树结构，非常方面，输出也比较直观
+        public static string Serielize(CDFTree<T> tree, Func<T, string> toString)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        //利用插入顺序表示构造树
+        public static CDFTree<string> Create(string input)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<T> getTreeInOrderWalk()
         {
             List<T> list = new List<T>();
