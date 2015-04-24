@@ -12,7 +12,7 @@ namespace TestProject
 {
     class Program
     {
-        
+
         static void Main(string[] args)
         {
             //var mySeries = new SortedList<DateTime, double>();
@@ -32,7 +32,7 @@ namespace TestProject
 
 
 
- // I find these codes on the web to see how Rx works.
+            // I find these codes on the web to see how Rx works.
             // Rx 中  Observable 类对 IObservable 进行了扩展，增加了一些静态，例如代码中的Interval的方法，可以供user使用。
             // Subscribe方法 不在 Rx 的命名空间之下，但是也是采用同样的方法实现了对 IObservable 的方法扩展。
 
@@ -53,63 +53,64 @@ namespace TestProject
             //subscription2.Dispose();
 
 
-       // To test observable.Range
-       // testObservableRange();
+            // To test observable.Range
+            // testObservableRange();
 
-       // To test Observable.Create()
-       //    testObservableCreate();
-       
-       //  To test observable.Never
-       //   testObservableNever();
+            // To test Observable.Create()
+            //    testObservableCreate();
 
-       //     testObservableRepeat();
+            //  To test observable.Never
+            //   testObservableNever();
 
-      //      testObservableReturn();
+            //     testObservableRepeat();
 
-       // TestNever
-      //     var reslt=Observable.Never<int>().Subscribe(new myob());
+            //      testObservableReturn();
 
-       // Now I can debug this code[  Observable.Range(1, 2).Aggregate((x, y) => x = x + y)], but still I can't understand the inner logic of Observable.subScribe().
-       // For the reason that I see no calls for subscribe or run.Is there some problems with my debug settings??
-       // There is no problem with my debug setting. The reason is that I dont call subscribe() really!!
-       // Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault(). Debug this code will be helpful for understanding!!!
+            // TestNever
+            //     var reslt=Observable.Never<int>().Subscribe(new myob());
 
-      //      Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault();
-       //     Console.ReadLine();
+            // Now I can debug this code[  Observable.Range(1, 2).Aggregate((x, y) => x = x + y)], but still I can't understand the inner logic of Observable.subScribe().
+            // For the reason that I see no calls for subscribe or run.Is there some problems with my debug settings??
+            // There is no problem with my debug setting. The reason is that I dont call subscribe() really!!
+            // Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault(). Debug this code will be helpful for understanding!!!
+
+            //      Observable.Range(1, 2).Aggregate((x, y) => x = x + y).FirstOrDefault();
+            //     Console.ReadLine();
 
 
-       //     testBufferWithBoundries();
-           
+            //     testBufferWithBoundries();
+
 
             /// TO TEST IEnumerable MOVEAVERAGE
-           // testMoveAverageIEnumerable();
+            // testMoveAverageIEnumerable();
 
             // Move Average with RX
             //  testMoveAverageWithRx();
 
             // This is another example that uses Rx to implement the functin of MoveAverage
             // Note that Asympotic time complexity is O(n)
-           //testMoveAverageWithRx2();
+            //testMoveAverageWithRx2();
 
             // This is a example to finish the moveAverage function with Observable object.
             //moveAverageWithObservable();
 
             // There begin the function to get the empircial distribution.
 
-           
+
             // Use the original red-black tree to coculate the CDF.
-           // testECDF();
+            // testECDF();
 
             // Use the extend data structure to get CDF.
             CDFTree<int> tree = new CDFTree<int>();
-            int[] array = { 3, 10, 7, 8, 18, 11, 22 ,2,1,15,14,33};
-            for (int i = 0; i < array.Length ;i++ )
+            int[] array = { 3, 10, 7, 8, 18, 11, 22, 2, 1, 15, 14, 33 };
+            for(int i = 0; i < array.Length; i++)
             {
-                tree.Add(array[i],1);
+                tree.Add(array[i], 1);
             }
-      
+
             var element = tree.getTreeInOrderWalk();
-            foreach(var elem in element){
+            foreach(var elem in element)
+            {
                 Console.Write(elem + " ");
             }
             Console.WriteLine();
@@ -118,23 +119,25 @@ namespace TestProject
             var list = tree.getTreeInLayer();
             int colum = 0;
             Console.WriteLine("Root");
-            foreach (var item in list){
-                if (item.key == default(int))
+            foreach(var item in list)
+            {
+                if(item.key == default(int))
                 {
-                    Console.WriteLine("Column {0}",++colum);
+                    Console.WriteLine("Column {0}", ++colum);
                 }
-                else if (item.isRed)
+                else if(item.isRed)
                 {
-                    Console.WriteLine("   "+item.key + " Red");
+                    Console.WriteLine("   " + item.key + " Red");
                 }
-                else {
-                    Console.WriteLine("   "+item.key + " Black");
+                else
+                {
+                    Console.WriteLine("   " + item.key + " Black");
                 }
             }
-            
+
             Console.ReadLine();
 
-          
+
         }
 
         private class myob : IObserver<int>
@@ -142,14 +145,14 @@ namespace TestProject
 
             public void OnCompleted()
             {
-                throw new NotImplementedException(); 
+                throw new NotImplementedException();
             }
 
             public void OnError(Exception error)
             {
                 throw new NotImplementedException();
             }
-               
+
             public void OnNext(int value)
             {
                 throw new NotImplementedException();
@@ -167,8 +170,8 @@ namespace TestProject
 
             var seed = default(Double);
             newSeries.Take(delta).Sum().Subscribe(x => seed = x);
-          // There I can get the  correct sum.
-          //  Console.WriteLine(seed);
+            // There I can get the  correct sum.
+            //  Console.WriteLine(seed);
             var result = Observable.Repeat(0.0, delta - 1).Concat(Observable.Repeat(seed / delta, 1));
 
 
@@ -179,7 +182,7 @@ namespace TestProject
             //    .Subscribe(Console.WriteLine);
 
 
-          
+
             //newSeries.Window(delta).ForEach(ob => {
 
             //    Console.Write(count+++"\t");
@@ -187,18 +190,18 @@ namespace TestProject
             //});
 
             var avarega = newSeries.Zip<double, double, double>(newSeries.Skip(delta), (x, y) => {
-               // Console.Write(count++ + ":\t " + x.ToString() + " " + y.ToString() + "\t");
+                // Console.Write(count++ + ":\t " + x.ToString() + " " + y.ToString() + "\t");
                 seed = seed - x + y;
                 return seed / delta;
             });
 
-           result.Concat(avarega).Subscribe(ob => {
+            result.Concat(avarega).Subscribe(ob => {
                 Console.WriteLine(count++ + ":\t " + ob);
-           });
+            });
 
-           
+
         }
-        
+
 
         private static void testMoveAverageWithRx2()
         {
@@ -251,7 +254,7 @@ namespace TestProject
 
             // Repeat :  Generates a sequence that contains one repeated value.
             // Concat: Concatenates two sequences.
-           
+
             smas = Observable.Repeat(double.NaN, delta - 1).Concat(new[] { seed }.ToObservable()).Concat(smas);
             // There we use the zip Function to print out the results.
             var _ = smas.Zip(Observable.Range(0, series.Length), (x, i) => {
@@ -278,7 +281,7 @@ namespace TestProject
             }
         }
 
-       
+
         private static void testBufferWithBoundries()
         {
             int countNum = 0;
@@ -312,7 +315,7 @@ namespace TestProject
 
         public static void testObservableRange()
         {
-           
+
             //var sumOfNumbers = Observable.Range(1, 10)
             //       .Aggregate(2, (x, y) => x + y, (x) => x - 30).FirstOrDefault();
 
@@ -326,7 +329,7 @@ namespace TestProject
             {
                 Console.WriteLine(sumOfNumbers.ElementAt(i).FirstOrDefault() + "\n");
             }
-          
+
             Console.ReadLine();
 
 
@@ -355,7 +358,7 @@ namespace TestProject
             // It seems that we use the same variable result and will certainly get the same execition number, but this will never happen because 
             // of the lazy evaluaion of C# and Rx. The variable you use each time is new and generated immediately!
             Random rand = new Random();
-            var result = Observable.Range(0,10).Select((_) => rand.Next(5) + rand.Next(5)).ECDF();
+            var result = Observable.Range(0, 10).Select((_) => rand.Next(5) + rand.Next(5)).ECDF();
             //result.Subscribe((ecdf) =>
             //{
             //    Console.WriteLine("Start printing dictionary of {0}", ecdf.Count);
@@ -379,7 +382,7 @@ namespace TestProject
 
             //var test = Observable.Repeat(1.0,1).ICDF<int>(result);
             //var test1 = Observable.Repeat(1.0, 1).ICDF<int>(dict);
-           
+
             //test.Subscribe(x => Console.WriteLine("Observable反向查询结果为： "+x));
             //test1.Subscribe(x => Console.WriteLine("Dictioanry反向查询结果为： " + x));
         }
@@ -416,7 +419,7 @@ namespace TestProject
                     double average = total / period;
                     result.Add(series.Keys[i], average);
                 }
-               
+
             }
             return result;
         }
