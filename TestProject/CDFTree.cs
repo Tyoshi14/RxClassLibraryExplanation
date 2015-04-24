@@ -63,6 +63,70 @@ namespace TestProject
         {
             return FrequencyHelper(root, value);
         }
+
+        #region + Test red-black tree +
+        public List<T> getTreeInOrderWalk() {
+            List<T> list = new List<T>();
+            iterateElement(root,ref list);
+            return list;
+        }
+
+        public class returnNode {
+            public T key;
+            public bool isRed;
+            public returnNode(T _key,bool _isRed) {
+                key = _key;
+                isRed = _isRed;
+            }
+        }
+        public List<returnNode> getTreeInLayer()
+        {
+            Node signal = new Node(default(T),10,true);
+            returnNode returnNodeSign = new returnNode(default(T),true);
+            List<returnNode> list = new List<returnNode>();
+            Queue<Node> quene = new Queue<Node>();
+
+            quene.Enqueue(root);
+            quene.Enqueue(signal);
+
+            while(quene.Count >0){
+                var node = quene.Dequeue();
+               
+                if (node == signal&& quene.Count>0) {
+                    list.Add(returnNodeSign);
+                    quene.Enqueue(signal);
+                    continue;
+                }
+                list.Add(new returnNode(node.Key, node.IsRed));
+                if(node.Left!=null){
+                    quene.Enqueue(node.Left);
+                }
+                if(node.Right != null){
+                    quene.Enqueue(node.Right);
+                }
+            }
+
+            return list;
+        }
+
+        // In-order walk to get the tree.
+        private void iterateElement(Node node, ref List<T> list)
+        {
+            if (node == null) return;
+            if(node.Left!=null ){
+                iterateElement(node.Left,ref list);
+            }
+            list.Add(node.Key);
+            if(node.Right!=null){
+                iterateElement(node.Right, ref list);
+            }
+
+        }
+
+
+        #endregion
+        
+        
         /// <summary>
         /// 自叶向根完成树的平衡
         /// 目前不用考虑计数字段CountThis和count属性们，只需完成平衡算法
@@ -73,7 +137,106 @@ namespace TestProject
         /// <param name="node"></param>
         internal void Balance(Node node)
         {
-            throw new NotImplementedException();
+            if (node.CountThis > 1) return;
+            while (node.Parent!=null && node.Parent != root && node.Parent.IsRed)
+            {
+                Node parentNode = node.Parent;
+
+                if (parentNode.Parent == parentNode.Parent.Left)
+                {
+                    Node uncleRight = parentNode.Parent.Right;
+                    if (uncleRight!=null && uncleRight.IsRed)
+                    {
+                        parentNode.IsRed = false;
+                        uncleRight.IsRed = false;
+                        parentNode.Parent.IsRed = true;
+                        node = parentNode.Parent;
+                    }
+                    else if (node == parentNode.Right)
+                    {
+                        node = parentNode;
+                        Left_rotation(node);
+                    }
+                    else
+                    {
+                        parentNode.IsRed = false;
+                        parentNode.Parent.IsRed = true;
+                        Right_rotation(parentNode.Parent);
+                    }
+                }
+                else {
+                    Node uncleLeft = parentNode.Parent.Left;
+                    if (uncleLeft!=null && uncleLeft.IsRed)
+                    {
+                        parentNode.IsRed = false;
+                        uncleLeft.IsRed = false;
+                        parentNode.Parent.IsRed = true;
+                        node = parentNode.Parent;
+                    }
+                    else if (node == parentNode.Left)
+                    {
+                        node = parentNode;
+                        Right_rotation(node);
+                    }
+                    else {
+                        parentNode.IsRed = false;
+                        parentNode.Parent.IsRed = true;
+                        Left_rotation(parentNode.Parent);
+                    }
+                }
+            }
+
+            root.IsRed = false;
+       }
+
+
+        private void Right_rotation(Node node)
+        {
+            Node leftChildren = node.Left;
+            node.Left=leftChildren.Right;
+            if (leftChildren.Right !=null )
+            {
+                leftChildren.Right.Parent = node;
+            }
+
+            leftChildren.Parent = node.Parent;
+            if(node.Parent==null){
+                root = leftChildren;
+            }
+            else if (node.Parent.Left == node)
+            {
+                node.Parent.Left = leftChildren;
+            }
+            else {
+                node.Parent.Right = leftChildren;
+            }
+
+            leftChildren.Right = node;
+            node.Parent = leftChildren;
+        }
+
+     
+        private void Left_rotation(Node node)
+        {
+            Node rightChild = node.Right;
+            node.Right = rightChild.Left;
+            if (rightChild.Left != null) {
+                rightChild.Left.Parent = node;
+            }
+            rightChild.Parent = node.Parent;
+
+            if (node.Parent == null) {
+                root = rightChild;
+            }
+            else if (node == node.Parent.Left)
+            {
+                node.Parent.Left = rightChild;
+            }
+            else {
+                node.Parent.Right = rightChild;
+            }
+            rightChild.Left = node;
+            node.Parent = rightChild;
         }
         /// <summary>
         /// 储存新样本的方法实现示意
@@ -170,6 +333,7 @@ namespace TestProject
             }
             return node.CountThis;
         }
+     
         /// <summary>
         /// 为累计分布函数扩充的红黑树
         /// </summary>

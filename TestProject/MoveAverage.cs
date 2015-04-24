@@ -1,5 +1,6 @@
 ﻿namespace TestProject
 {
+    // The code is used for rx exercise not the part of the project.
     // The code website is 
     // http://stackoverflow.com/questions/5166716/linq-to-calculate-a-moving-average-of-a-sortedlistdatetime-double
     class MovingAverage
