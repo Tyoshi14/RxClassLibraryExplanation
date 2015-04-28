@@ -59,6 +59,7 @@
     <Compile Include="CDFTree.cs" />
     <Compile Include="ECDF.cs" />
     <Compile Include="IEnumerableExtension.cs" />
+    <Compile Include="MedianTree.cs" />
     <Compile Include="MoveAverage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
