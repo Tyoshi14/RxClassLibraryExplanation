@@ -274,6 +274,47 @@ namespace TestProject
             node.Right.IsRed = false;
         }
 
+        public static string Serielize(SortedSet<T> tree, Func<T, string> toString)
+        {
+            return serielizeHelper(tree.root, toString).Item1;
+        }
+        private static Tuple<string, bool> serielizeHelper(Node node, Func<T, string> toString)
+        {
+            if(node == null)
+                return Tuple.Create("", true);
+            string key = toString(node.Item);
+            if(node.IsRed)
+                key = key.ToLower();
+            if(node.Left == null && node.Right == null)
+                return Tuple.Create(key, true);
+            if(node.Left == null && node.Right != null)
+                return Tuple.Create(key + "(" + serielizeHelper(node.Right, toString).Item1 + ")", false);
+            if(node.Left != null && node.Right == null)
+                return Tuple.Create("(" + serielizeHelper(node.Left, toString).Item1 + ")" + key, false);
+            Tuple<string, bool> left = serielizeHelper(node.Left, toString);
+            Tuple<string, bool> right = serielizeHelper(node.Right, toString);
+            string result = "";
+            if(left.Item2)
+                result += left.Item1;
+            else
+                result += "(" + left.Item1 + ")";
+            result += key;
+            if(right.Item2)
+                result += right.Item1;
+            else
+                result += "(" + right.Item1 + ")";
+            return Tuple.Create(result, false);
+        }
+
+        //利用插入顺序表示构造树
+        public static SortedSet<char> Create(string input)
+        {
+            var result = new SortedSet<char>();
+            foreach(var k in input)
+                if(k >= 'A' && k <= 'Z')
+                    result.Add(k);
+            return result;
+        }
         #endregion
 
         #region Helper Classes

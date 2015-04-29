@@ -139,25 +139,35 @@ namespace TestProject
 
             Console.ReadLine();
 
-            ////TestCDFTree("", "");
-            TestCDFTree("A", "A");
-            TestCDFTree("A+B", "A(B)");
-            TestCDFTree("B+A", "(A)B");
-            TestCDFTree("D[BF][ACEG]", "(ABC)D(EFG)");
-            TestCDFTree("B[AD][CF][EG]", "(ABC)D(EFG)");
-            TestCDFTree("F[DG][BE][AC]", "(ABC)D(EFG)");
-            TestCDFTree("B[AF][DG][CE]", "(ABC)D(EFG)");
-            TestCDFTree("F[BG][AD][CE]", "(ABC)D(EFG)");
+            TestCDFTree("");
+            TestCDFTree("A");
+            TestCDFTree("A+B");
+            TestCDFTree("B+A");
+            TestCDFTree("D[BF][ACEG]");
+            TestCDFTree("B[AD][CF][EG]");
+            TestCDFTree("F[DG][BE][AC]");
+            TestCDFTree("B[AF][DG][CE]");
+            TestCDFTree("F[BG][AD][CE]");
+            Random r = new Random();
+            for(int i = 0; i < 10; i++)
+            {
+                int n = r.Next(0, 64);
+                char[] cs = new char[n];
+                for(int j = 0; j < n; j++)
+                    cs[j] =(char)('A' + r.Next(26));
+                TestCDFTree(new string(cs));
+            }
 
             Console.ReadLine();
 
         }
 
-        private static void TestCDFTree(string testInput, string expectedOutput)
+        private static void TestCDFTree(string testInput)
         {
             Console.WriteLine("Testing: {0}", testInput);
-            Console.WriteLine("Expecting: {0}", expectedOutput);
+            string expectedOutput = SortedSet<char>.Serielize(SortedSet<char>.Create(testInput), k => k.ToString());
             string testOutput = CDFTree<char>.Serielize(CDFTree<char>.Create(testInput), k => k.ToString());
+            Console.WriteLine("Expecting: {0}", expectedOutput);
             Console.WriteLine("Get: {0}", testOutput);
             if(testOutput.Equals(expectedOutput))
             {
