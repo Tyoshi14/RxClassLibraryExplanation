@@ -20,6 +20,8 @@ namespace TestProject
     /// </summary>
     public class CDFTree<T>
     {
+        // 设置一个标志，用来区分外部和内部的结点。
+       //  public static Node nil;
         Node root;
         IComparer<T> comparer;
         public CDFTree()
@@ -239,16 +241,19 @@ namespace TestProject
         /// <param name="node"></param>
         internal void Balance(Node node)
         {
+         
             if(node.CountThis > 1)
                 return;
-            while(node.Parent != null && node.Parent != root && node.Parent.IsRed)
+            while (node.Parent != null && node.Parent.IsRed)
             {
                 Node parentNode = node.Parent;
 
-                if(parentNode.Parent == parentNode.Parent.Left)
+                if(parentNode == parentNode.Parent.Left)
                 {
                     Node uncleRight = parentNode.Parent.Right;
-                    if(uncleRight != null && uncleRight.IsRed)
+                    // In case that the right child may be null in our CDFTree unlike normal red-black tree with a nil tag.
+                    // we need to make sure that the uncle node of the insert node cant be null.
+                   if(uncleRight!= null && uncleRight.IsRed)
                     {
                         parentNode.IsRed = false;
                         uncleRight.IsRed = false;
@@ -270,7 +275,7 @@ namespace TestProject
                 else
                 {
                     Node uncleLeft = parentNode.Parent.Left;
-                    if(uncleLeft != null && uncleLeft.IsRed)
+                    if (uncleLeft != null&& uncleLeft.IsRed)
                     {
                         parentNode.IsRed = false;
                         uncleLeft.IsRed = false;

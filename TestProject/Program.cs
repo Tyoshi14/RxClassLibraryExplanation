@@ -102,41 +102,42 @@ namespace TestProject
             // testECDF();
 
             // Use the extend data structure to get CDF.
-            ////CDFTree<int> tree = new CDFTree<int>();
-            ////int[] array = { 3, 10, 7, 8, 18, 11, 22, 2, 1, 15, 14, 33 };
-            ////for(int i = 0; i < array.Length; i++)
-            ////{
-            ////    tree.Add(array[i], 1);
-            ////}
+            CDFTree<int> tree = new CDFTree<int>();
+            //int[] array = { 3, 10, 7, 8, 18, 11, 22, 2, 1, 15, 14, 33 };
+            //int[] array = { 3, 10, 7,11,9,4,2};
+            //for (int i = 0; i < array.Length; i++)
+            //{
+            //    tree.Add(array[i], 1);
+            //}
 
-            ////var element = tree.getTreeInOrderWalk();
-            ////foreach(var elem in element)
-            ////{
-            ////    Console.Write(elem + " ");
-            ////}
-            ////Console.WriteLine();
+            //var element = tree.getTreeInOrderWalk();
+            //foreach (var elem in element)
+            //{
+            //    Console.Write(elem + " ");
+            //}
+            //Console.WriteLine();
 
 
-            ////var list = tree.getTreeInLayer();
-            ////int colum = 0;
-            ////Console.WriteLine("Root");
-            ////foreach(var item in list)
-            ////{
-            ////    if(item.key == default(int))
-            ////    {
-            ////        Console.WriteLine("Column {0}", ++colum);
-            ////    }
-            ////    else if(item.isRed)
-            ////    {
-            ////        Console.WriteLine("   " + item.key + " Red");
-            ////    }
-            ////    else
-            ////    {
-            ////        Console.WriteLine("   " + item.key + " Black");
-            ////    }
-            ////}
+            //var list = tree.getTreeInLayer();
+            //int colum = 0;
+            //Console.WriteLine("Root");
+            //foreach (var item in list)
+            //{
+            //    if (item.key == default(int))
+            //    {
+            //        Console.WriteLine("Column {0}", ++colum);
+            //    }
+            //    else if (item.isRed)
+            //    {
+            //        Console.WriteLine("   " + item.key + " Red");
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("   " + item.key + " Black");
+            //    }
+            //}
 
-            ////Console.ReadLine();
+            Console.ReadLine();
 
             ////TestCDFTree("", "");
             TestCDFTree("A", "A");
