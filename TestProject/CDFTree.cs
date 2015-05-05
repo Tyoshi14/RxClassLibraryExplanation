@@ -44,7 +44,10 @@ namespace TestProject
             {
                 if(root == null)
                     return 0;
-                return root.Count;
+             // Use the inner recursive function to get the sample size.
+             //   return root.Count;
+             // There we use the new  member variable to calculate the sample size.
+                return root.SubTreeSize + root.CountThis;
             }
         }
         public void Add(T sample, ulong number = 1)
@@ -170,16 +173,19 @@ namespace TestProject
         {
             public T key;
             public bool isRed;
-            public returnNode(T _key, bool _isRed)
+            public ulong subtreesize;
+
+            public returnNode(T _key, bool _isRed, ulong size)
             {
                 key = _key;
                 isRed = _isRed;
+                subtreesize = size;
             }
         }
         public List<returnNode> getTreeInLayer()
         {
             Node signal = new Node(default(T), 10, true);
-            returnNode returnNodeSign = new returnNode(default(T), true);
+            returnNode returnNodeSign = new returnNode(default(T), true,0);
             List<returnNode> list = new List<returnNode>();
             Queue<Node> quene = new Queue<Node>();
 
@@ -196,7 +202,8 @@ namespace TestProject
                     quene.Enqueue(signal);
                     continue;
                 }
-                list.Add(new returnNode(node.Key, node.IsRed));
+                list.Add(new returnNode(node.Key, node.IsRed, node.SubTreeSize));
+
                 if(node.Left != null)
                 {
                     quene.Enqueue(node.Left);
@@ -303,6 +310,36 @@ namespace TestProject
         private void Right_rotation(Node node)
         {
             Node leftChildren = node.Left;
+            // Adjust the subtreeSize
+            node.SubTreeSize = (node.Right == null ? 0 : node.Right.SubTreeSize+node.Right.CountThis) + (leftChildren.Right == null ? 0 : leftChildren.Right.SubTreeSize+leftChildren.Right.CountThis);
+            leftChildren.SubTreeSize = (leftChildren.Left == null ? 0 : leftChildren.Left.SubTreeSize+leftChildren.Left.CountThis) + node.SubTreeSize+node.CountThis;
+            
+            //if (leftChildren.Left == null)
+            //{
+            //    leftChildren.SubTreeSize = 0 + node.SubTreeSize;
+            //}
+            //else {
+            //    leftChildren.SubTreeSize = leftChildren.Left.SubTreeSize + node.SubTreeSize;
+            //}
+           
+
+            //if (node.Right == null && leftChildren.Right == null)
+            //{
+            //    node.SubTreeSize = 0;
+            //}
+            //else if (node.Right == null)
+            //{
+            //    node.SubTreeSize = leftChildren.Right.SubTreeSize;
+            //}
+            //else if (leftChildren.Right == null)
+            //{
+            //    node.SubTreeSize = node.Right.SubTreeSize;
+            //}
+            //else {
+            //    node.SubTreeSize = leftChildren.Right.SubTreeSize + node.Right.SubTreeSize;
+            //}
+
+            // Perform the rotation
             node.Left = leftChildren.Right;
             if(leftChildren.Right != null)
             {
@@ -331,6 +368,12 @@ namespace TestProject
         private void Left_rotation(Node node)
         {
             Node rightChild = node.Right;
+
+            // adjust the subtreeSize 
+            node.SubTreeSize = (node.Left == null ? 0 : node.Left.SubTreeSize + node.Left.CountThis) + (rightChild.Left == null ? 0 : rightChild.Left.SubTreeSize + rightChild.Left.CountThis);
+            rightChild.SubTreeSize = node.SubTreeSize + node.CountThis + (rightChild.Right == null ? 0 : rightChild.Right.SubTreeSize + rightChild.Right.CountThis);
+         
+            // Adjust the rotation
             node.Right = rightChild.Left;
             if(rightChild.Left != null)
             {
@@ -352,6 +395,9 @@ namespace TestProject
             }
             rightChild.Left = node;
             node.Parent = rightChild;
+           
+            
+
         }
         /// <summary>
         /// 储存新样本的方法实现示意
@@ -362,11 +408,13 @@ namespace TestProject
         /// <returns>最终插入节点</returns>
         internal Node AddHelper(ref Node node, T sample, ulong number, Node parent)
         {
-            if(node == null)
+            if (node == null)
             {
                 node = new Node(sample, number);//note that node is by ref
                 node.Parent = parent;
                 return node;
+            }else {
+                node.SubTreeSize+=number;
             }
             int cmp = comparer.Compare(sample, node.Key);
             if(cmp < 0)
@@ -377,6 +425,7 @@ namespace TestProject
             checked
             {
                 node.CountThis += number;
+                node.SubTreeSize -= number;
             }
             return node;
         }
@@ -401,7 +450,7 @@ namespace TestProject
             if(cmp > 0)
             {
                 if(node.Right == null)
-                    return (double)node.CountLessAndEqual / SampleSize;
+                  return (double)node.CountLessAndEqual / SampleSize;
                 return CDFHelper(node.Right, value);
             }
             return (double)node.CountLessAndEqual / SampleSize;
@@ -456,6 +505,7 @@ namespace TestProject
         {
             public T Key;//key value
             public ulong CountThis;//number of samples that Compare(smaple,Key)==0
+            public ulong SubTreeSize; // the number of nodes in the subtree.
             public Node Left;//left subtree to store Compare(smaple,Key)<0
             public Node Right;//right subtree to store Compare(sample,Key)>0
             public Node Parent;//for easier tree traversal 这样就可以写递归的算法 如果能够写出不使用的更好
@@ -465,6 +515,7 @@ namespace TestProject
                 this.Key = sample;
                 this.CountThis = number;
                 this.IsRed = isRed;// The default color will be red, we never need to create a black node directly.
+                this.SubTreeSize = 0;
             }
             #region properties
             //现在这种实现递归起来很要命，但实现起来最接近标准红黑树，是个不错的起点。
@@ -473,8 +524,9 @@ namespace TestProject
             {
                 get
                 {
-                    if(Left != null)
-                        return Left.Count;
+                    if (Left != null)
+                        // return Left.Count;
+                        return Left.SubTreeSize + Left.CountThis;
                     return 0;
                 }
             }
@@ -484,7 +536,8 @@ namespace TestProject
                 {
                     checked
                     {
-                        return CountLeft + CountThis + CountRight;
+                        //return CountLeft + CountThis + CountRight;
+                        return SubTreeSize + CountThis;
                     }
                 }
             }
@@ -492,8 +545,9 @@ namespace TestProject
             {
                 get
                 {
-                    if(Right != null)
-                        return Right.Count;
+                    if (Right != null)
+                        // return Right.Count;
+                        return Right.SubTreeSize + Right.CountThis;
                     return 0;
                 }
             }
@@ -515,7 +569,8 @@ namespace TestProject
                 {
                     checked
                     {
-                        return CountLess + CountThis;
+                        //return CountLess + CountThis;
+                       return  Left.SubTreeSize + Left.CountThis + CountThis;
                     }
                 }
             }

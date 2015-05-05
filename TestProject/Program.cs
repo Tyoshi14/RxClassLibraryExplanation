@@ -103,12 +103,12 @@ namespace TestProject
 
             // Use the extend data structure to get CDF.
             CDFTree<int> tree = new CDFTree<int>();
-            //int[] array = { 3, 10, 7, 8, 18, 11, 22, 2, 1, 15, 14, 33 };
-            //int[] array = { 3, 10, 7,11,9,4,2};
-            //for (int i = 0; i < array.Length; i++)
-            //{
-            //    tree.Add(array[i], 1);
-            //}
+           int[] array = { 3, 10, 7,15,14,35,24,33,23,21,36,36,33};
+           // int[] array = { 3, 10, 7, 11, 9, 4, 2};
+            for (int i = 0; i < array.Length; i++)
+            {
+                tree.Add(array[i], 1);
+            }
 
             //var element = tree.getTreeInOrderWalk();
             //foreach (var elem in element)
@@ -118,45 +118,46 @@ namespace TestProject
             //Console.WriteLine();
 
 
-            //var list = tree.getTreeInLayer();
-            //int colum = 0;
-            //Console.WriteLine("Root");
-            //foreach (var item in list)
-            //{
-            //    if (item.key == default(int))
-            //    {
-            //        Console.WriteLine("Column {0}", ++colum);
-            //    }
-            //    else if (item.isRed)
-            //    {
-            //        Console.WriteLine("   " + item.key + " Red");
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine("   " + item.key + " Black");
-            //    }
-            //}
-
-            Console.ReadLine();
-
-            TestCDFTree("");
-            TestCDFTree("A");
-            TestCDFTree("A+B");
-            TestCDFTree("B+A");
-            TestCDFTree("D[BF][ACEG]");
-            TestCDFTree("B[AD][CF][EG]");
-            TestCDFTree("F[DG][BE][AC]");
-            TestCDFTree("B[AF][DG][CE]");
-            TestCDFTree("F[BG][AD][CE]");
-            Random r = new Random();
-            for(int i = 0; i < 10; i++)
+            var list = tree.getTreeInLayer();
+            int colum = 0;
+            Console.WriteLine("Root");
+            foreach (var item in list)
             {
-                int n = r.Next(0, 64);
-                char[] cs = new char[n];
-                for(int j = 0; j < n; j++)
-                    cs[j] =(char)('A' + r.Next(26));
-                TestCDFTree(new string(cs));
+                if (item.key == default(int))
+                {
+                    Console.WriteLine("Column {0}", ++colum);
+                }
+                else if (item.isRed)
+                {
+                    //  subTreeSize is used to see whether we get the right subtree number
+                    Console.WriteLine("   " + item.key + " Red" + " subTreeSize: " + item.subtreesize);
+                }
+                else
+                {
+                    Console.WriteLine("   " + item.key + " Black" + " subTreeSize: " + item.subtreesize);
+                }
             }
+
+            
+
+            //TestCDFTree("");
+            //TestCDFTree("A");
+            //TestCDFTree("A+B");
+            //TestCDFTree("B+A");
+            //TestCDFTree("D[BF][ACEG]");
+            //TestCDFTree("B[AD][CF][EG]");
+            //TestCDFTree("F[DG][BE][AC]");
+            //TestCDFTree("B[AF][DG][CE]");
+            //TestCDFTree("F[BG][AD][CE]");
+            //Random r = new Random();
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    int n = r.Next(0, 64);
+            //    char[] cs = new char[n];
+            //    for (int j = 0; j < n; j++)
+            //        cs[j] = (char)('A' + r.Next(26));
+            //    TestCDFTree(new string(cs));
+            //}
 
             Console.ReadLine();
 
@@ -168,7 +169,7 @@ namespace TestProject
             string expectedOutput = SortedSet<char>.Serielize(SortedSet<char>.Create(testInput), k => k.ToString());
             string testOutput = CDFTree<char>.Serielize(CDFTree<char>.Create(testInput), k => k.ToString());
             Console.WriteLine("Expecting: {0}", expectedOutput);
-            Console.WriteLine("Get: {0}", testOutput);
+            Console.WriteLine("Get:       {0}", testOutput);
             if(testOutput.Equals(expectedOutput))
             {
                 Console.ForegroundColor = ConsoleColor.Green;
