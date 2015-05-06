@@ -436,6 +436,7 @@ namespace TestProject
         /// <param name="node">初始查询节点</param>
         /// <param name="value">随机变量取值</param>
         /// <returns>累计概率</returns>
+        //这个函数需要加一个参数以解决非“左子左孙”嫡系的计数问题
         internal double CDFHelper(Node node, T value)
         {
             if(node == null)
@@ -501,6 +502,7 @@ namespace TestProject
         /// <summary>
         /// 为累计分布函数扩充的红黑树
         /// </summary>
+        // Node中所有的属性（property）都要舍弃掉，只保留字段（field）
         internal class Node
         {
             public T Key;//key value
@@ -526,6 +528,7 @@ namespace TestProject
                 {
                     if (Left != null)
                         // return Left.Count;
+                        //左子树的右子树是什么性质？
                         return Left.SubTreeSize + Left.CountThis;
                     return 0;
                 }
@@ -570,6 +573,7 @@ namespace TestProject
                     checked
                     {
                         //return CountLess + CountThis;
+                        //改造后这个属性就不能再用了。下面这个算法只能解决“左子左孙”这些嫡系，其它都会出错。
                        return  Left.SubTreeSize + Left.CountThis + CountThis;
                     }
                 }
