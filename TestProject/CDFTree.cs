@@ -442,6 +442,7 @@ namespace TestProject
         /// <param name="countNum">记录所有小于等于查询结点个数</param>
         /// <returns>累计概率</returns>
         //这个函数需要加一个参数以解决非“左子左孙”嫡系的计数问题
+        //现在的思路是对的
         internal double CDFHelper(Node node, T value, ulong countNum)
         {
             if(node == null)
@@ -460,6 +461,7 @@ namespace TestProject
                     countNum += node.SubTreeSize + node.CountThis;
                     return (double)countNum / SampleSize;
                 }
+                //为什么要提前减去右子树的两个计数？
                 countNum = countNum + node.SubTreeSize + node.CountThis - node.Right.SubTreeSize - node.Right.CountThis;
                 return CDFHelper(node.Right, value,countNum);
             }
