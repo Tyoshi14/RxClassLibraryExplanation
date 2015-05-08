@@ -58,11 +58,15 @@ namespace TestProject
         }
         public double CDF(T value)
         {
-            return CDFHelper(root, value);
+            return CDFHelper(root, value,0);
         }
         public T ICDF(double p)
         {
-            return ICDFHelper(root, p);
+            ulong countLess = 0;
+            if (root != null) {
+                countLess = root.SubTreeSize + root.CountThis - (root.Right == null ? 0 : root.Right.SubTreeSize) - (root.Right == null ? 0 : root.Right.CountThis);
+            }
+            return ICDFHelper(root, p, countLess);
         }
         public ulong Frequency(T value)
         {
@@ -435,9 +439,10 @@ namespace TestProject
         /// </summary>
         /// <param name="node">初始查询节点</param>
         /// <param name="value">随机变量取值</param>
+        /// <param name="countNum">记录所有小于等于查询结点个数</param>
         /// <returns>累计概率</returns>
         //这个函数需要加一个参数以解决非“左子左孙”嫡系的计数问题
-        internal double CDFHelper(Node node, T value)
+        internal double CDFHelper(Node node, T value, ulong countNum)
         {
             if(node == null)
                 return double.NaN;
@@ -445,16 +450,22 @@ namespace TestProject
             if(cmp < 0)
             {
                 if(node.Left == null)
-                    return (double)node.CountLess / SampleSize;
-                return CDFHelper(node.Left, value);
+                    return (double)countNum / SampleSize;
+                return CDFHelper(node.Left, value,countNum);
             }
             if(cmp > 0)
             {
-                if(node.Right == null)
-                  return (double)node.CountLessAndEqual / SampleSize;
-                return CDFHelper(node.Right, value);
+                if (node.Right == null)
+                {
+                    countNum += node.SubTreeSize + node.CountThis;
+                    return (double)countNum / SampleSize;
+                }
+                countNum = countNum + node.SubTreeSize + node.CountThis - node.Right.SubTreeSize - node.Right.CountThis;
+                return CDFHelper(node.Right, value,countNum);
             }
-            return (double)node.CountLessAndEqual / SampleSize;
+
+            countNum = countNum + node.SubTreeSize + node.CountThis - (node.Right == null ? 0 : node.Right.SubTreeSize) - (node.Right == null ? 0 : node.Right.CountThis);
+            return (double)countNum / SampleSize;
         }
         /// <summary>
         /// 查询累计概率反函数的方法示意，参考
@@ -462,18 +473,26 @@ namespace TestProject
         /// </summary>
         /// <param name="node">初始查询节点</param>
         /// <param name="p">累计概率</param>
+        /// <param name="countNum">记录查询结点的个数</param>
         /// <returns>随机变量取值</returns>
-        internal T ICDFHelper(Node node, double p)
+        internal T ICDFHelper(Node node, double p,ulong countNum)
         {
             if(root == null)
                 throw new NotSupportedException();
-            double k = (double)node.CountLessAndEqual / SampleSize;
+            double k = (double)countNum / SampleSize;
+
             if(p < k && node.Left != null)
-                return ICDFHelper(node.Left, p);
+            {
+                countNum = countNum - (node.Left.Right == null ? 0 : node.Left.Right.SubTreeSize) - (node.Left.Right == null ? 0 : node.Left.Right.CountThis);
+                return ICDFHelper(node.Right, p, countNum);
+            }
             if(p > k)
             {
-                if(node.Right != null)
-                    return ICDFHelper(node.Right, p);
+                if (node.Right != null)
+                {
+                    countNum = countNum + (node.Right.Left == null ? 0 : node.Right.Left.SubTreeSize) + (node.Right.Left == null ? 0 : node.Right.Left.CountThis) + node.Right.CountThis;
+                    return ICDFHelper(node.Right, p, countNum);
+                }
                 if(node.Parent != null && node.Parent.Left == node)
                     return node.Parent.Key;
             }
@@ -519,66 +538,6 @@ namespace TestProject
                 this.IsRed = isRed;// The default color will be red, we never need to create a black node directly.
                 this.SubTreeSize = 0;
             }
-            #region properties
-            //现在这种实现递归起来很要命，但实现起来最接近标准红黑树，是个不错的起点。
-            //另外一种办法就是缓存计算结果并在样本发生变化时调整，这样整个CDFTree各部分都需要有较大改动。
-            public ulong CountLeft//total number of samples stored in the left subtree
-            {
-                get
-                {
-                    if (Left != null)
-                        // return Left.Count;
-                        //左子树的右子树是什么性质？
-                        return Left.SubTreeSize + Left.CountThis;
-                    return 0;
-                }
-            }
-            public ulong Count//total number of samples in this tree
-            {
-                get
-                {
-                    checked
-                    {
-                        //return CountLeft + CountThis + CountRight;
-                        return SubTreeSize + CountThis;
-                    }
-                }
-            }
-            public ulong CountRight//total number of samples stored in the right subtree
-            {
-                get
-                {
-                    if (Right != null)
-                        // return Right.Count;
-                        return Right.SubTreeSize + Right.CountThis;
-                    return 0;
-                }
-            }
-            public ulong CountLess
-            {
-                get
-                {
-                    if(Parent != null && Parent.Right == this)
-                        checked
-                        {
-                            return Parent.CountLessAndEqual + CountLeft;
-                        }
-                    return CountLeft;
-                }
-            }
-            public ulong CountLessAndEqual
-            {
-                get
-                {
-                    checked
-                    {
-                        //return CountLess + CountThis;
-                        //改造后这个属性就不能再用了。下面这个算法只能解决“左子左孙”这些嫡系，其它都会出错。
-                       return  Left.SubTreeSize + Left.CountThis + CountThis;
-                    }
-                }
-            }
-            #endregion
         }
     }
 }

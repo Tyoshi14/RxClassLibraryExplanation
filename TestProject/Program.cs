@@ -138,7 +138,14 @@ namespace TestProject
                 }
             }
 
+            // To test CDF fand ICDF
+
+            for (int j = 0; j < 10;j++ )
+            {
+                Console.WriteLine(tree.CDF(j));
             
+            }
+           
 
             //TestCDFTree("");
             //TestCDFTree("A");
