@@ -462,6 +462,7 @@ namespace TestProject
                     return (double)countNum / SampleSize;
                 }
                 //为什么要提前减去右子树的两个计数？
+                // 因为countNum保存的是所有小于node结点的结点的个数。
                 countNum = countNum + node.SubTreeSize + node.CountThis - node.Right.SubTreeSize - node.Right.CountThis;
                 return CDFHelper(node.Right, value,countNum);
             }
