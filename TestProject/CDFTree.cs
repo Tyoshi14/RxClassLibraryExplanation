@@ -64,7 +64,8 @@ namespace TestProject
         {
             ulong countLess = 0;
             if (root != null) {
-                countLess = root.SubTreeSize + root.CountThis - (root.Right == null ? 0 : root.Right.SubTreeSize) - (root.Right == null ? 0 : root.Right.CountThis);
+                countLess = root.SubTreeSize + root.CountThis 
+                    - (root.Right == null ? 0 : root.Right.SubTreeSize) - (root.Right == null ? 0 : root.Right.CountThis);
             }
             return ICDFHelper(root, p, countLess);
         }
@@ -483,17 +484,24 @@ namespace TestProject
             if(root == null)
                 throw new NotSupportedException();
             double k = (double)countNum / SampleSize;
+            //Console.WriteLine(node.Key + "k value "+ k);
+           // Console.WriteLine(node.Key+" Count less and equal : "+countNum);
 
             if(p < k && node.Left != null)
             {
-                countNum = countNum - (node.Left.Right == null ? 0 : node.Left.Right.SubTreeSize) - (node.Left.Right == null ? 0 : node.Left.Right.CountThis);
-                return ICDFHelper(node.Right, p, countNum);
+                countNum = countNum -
+                    (node.Left.Right == null ? 0 : node.Left.Right.SubTreeSize) -
+                    (node.Left.Right == null ? 0 : node.Left.Right.CountThis)
+                    - node.Left.CountThis;
+                return ICDFHelper(node.Left, p, countNum);
             }
             if(p > k)
             {
                 if (node.Right != null)
                 {
-                    countNum = countNum + (node.Right.Left == null ? 0 : node.Right.Left.SubTreeSize) + (node.Right.Left == null ? 0 : node.Right.Left.CountThis) + node.Right.CountThis;
+                    countNum = countNum + (node.Right.Left == null ? 0 : node.Right.Left.SubTreeSize) 
+                        + (node.Right.Left == null ? 0 : node.Right.Left.CountThis) 
+                        + node.Right.CountThis;
                     return ICDFHelper(node.Right, p, countNum);
                 }
                 if(node.Parent != null && node.Parent.Left == node)

@@ -140,11 +140,16 @@ namespace TestProject
 
             // To test CDF fand ICDF
 
-            for (int j = 0; j < 10;j++ )
+            for (int j = 0; j < 40; j++)
             {
-                Console.WriteLine(tree.CDF(j));
-            
+                double value=tree.CDF(j);
+                Console.WriteLine(j);
+                Console.WriteLine("反向查询 "+j +" 概率 "+value +" 的结果为 " + tree.ICDF(value));
+                Console.WriteLine();
+
             }
+
+
            
 
             //TestCDFTree("");
