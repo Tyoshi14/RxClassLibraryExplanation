@@ -103,7 +103,7 @@ namespace TestProject
 
             // Use the extend data structure to get CDF.
             CDFTree<int> tree = new CDFTree<int>();
-           int[] array = { 3, 10, 7,15,14,35,24,33,23,21,36,36,33};
+           int[] array = {1,128,2,64,4,32,8,16,2,32};
            // int[] array = { 3, 10, 7, 11, 9, 4, 2};
             for (int i = 0; i < array.Length; i++)
             {
@@ -138,40 +138,98 @@ namespace TestProject
                 }
             }
 
-            // To test CDF fand ICDF
+			// To test CDF fand ICDF
 
-            for (int j = 0; j < 40; j++)
-            {
-                double value=tree.CDF(j);
-                Console.WriteLine(j);
-                Console.WriteLine("反向查询 "+j +" 概率 "+value +" 的结果为 " + tree.ICDF(value));
-                Console.WriteLine();
+			for(int j = 0;j < 130;j++)
+			{
+				double value = tree.CDF(j);
+				int expect;
+				if(j < 1)
+				{
+					expect = 1;//this is wrong
+					if(value != 0)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				else if(j < 2)
+				{
+					expect = 1;
+					if(value != 0.1)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				else if(j < 4)
+				{
+					expect = 2;
+					if(value != 0.3)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				else if(j < 8)
+				{
+					expect = 4;
+					if(value != 0.4)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				else if(j < 16)
+				{
+					expect = 8;
+					if(value != 0.5)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				else if(j < 32)
+				{
+					expect = 16;
+					if(value != 0.6)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				else if(j < 64)
+				{
+					expect = 32;
+					if(value != 0.8)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				else if(j < 128)
+				{
+					expect = 64;
+					if(value != 0.9)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				else
+				{
+					expect = 128;
+					if(value != 1)
+						Console.ForegroundColor = ConsoleColor.Red;
+				}
+				var icdfp = tree.ICDF(value);
+				if(expect != icdfp)
+					Console.ForegroundColor = ConsoleColor.Magenta;
+				//Console.WriteLine(j);
+				Console.WriteLine("反向查询 " + j + " 概率 " + value + " 的结果为 " + icdfp);
+				//Console.WriteLine();
+				Console.ResetColor();
+			}
 
-            }
 
 
-           
 
-            //TestCDFTree("");
-            //TestCDFTree("A");
-            //TestCDFTree("A+B");
-            //TestCDFTree("B+A");
-            //TestCDFTree("D[BF][ACEG]");
-            //TestCDFTree("B[AD][CF][EG]");
-            //TestCDFTree("F[DG][BE][AC]");
-            //TestCDFTree("B[AF][DG][CE]");
-            //TestCDFTree("F[BG][AD][CE]");
-            //Random r = new Random();
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    int n = r.Next(0, 64);
-            //    char[] cs = new char[n];
-            //    for (int j = 0; j < n; j++)
-            //        cs[j] = (char)('A' + r.Next(26));
-            //    TestCDFTree(new string(cs));
-            //}
+			//TestCDFTree("");
+			//TestCDFTree("A");
+			//TestCDFTree("A+B");
+			//TestCDFTree("B+A");
+			//TestCDFTree("D[BF][ACEG]");
+			//TestCDFTree("B[AD][CF][EG]");
+			//TestCDFTree("F[DG][BE][AC]");
+			//TestCDFTree("B[AF][DG][CE]");
+			//TestCDFTree("F[BG][AD][CE]");
+			//Random r = new Random();
+			//for (int i = 0; i < 10; i++)
+			//{
+			//    int n = r.Next(0, 64);
+			//    char[] cs = new char[n];
+			//    for (int j = 0; j < n; j++)
+			//        cs[j] = (char)('A' + r.Next(26));
+			//    TestCDFTree(new string(cs));
+			//}
 
-            Console.ReadLine();
+			Console.ReadLine();
 
         }
 
