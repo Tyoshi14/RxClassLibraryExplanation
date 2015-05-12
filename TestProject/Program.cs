@@ -118,25 +118,25 @@ namespace TestProject
             //Console.WriteLine();
 
 
-            var list = tree.getTreeInLayer();
-            int colum = 0;
-            Console.WriteLine("Root");
-            foreach (var item in list)
-            {
-                if (item.key == default(int))
-                {
-                    Console.WriteLine("Column {0}", ++colum);
-                }
-                else if (item.isRed)
-                {
-                    //  subTreeSize is used to see whether we get the right subtree number
-                    Console.WriteLine("   " + item.key + " Red" + " subTreeSize: " + item.subtreesize);
-                }
-                else
-                {
-                    Console.WriteLine("   " + item.key + " Black" + " subTreeSize: " + item.subtreesize);
-                }
-            }
+            //var list = tree.getTreeInLayer();
+            //int colum = 0;
+            //Console.WriteLine("Root");
+            //foreach (var item in list)
+            //{
+            //    if (item.key == default(int))
+            //    {
+            //        Console.WriteLine("Column {0}", ++colum);
+            //    }
+            //    else if (item.isRed)
+            //    {
+            //        //  subTreeSize is used to see whether we get the right subtree number
+            //        Console.WriteLine("   " + item.key + " Red" + " subTreeSize: " + item.subtreesize);
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("   " + item.key + " Black" + " subTreeSize: " + item.subtreesize);
+            //    }
+            //}
 
 			// To test CDF fand ICDF
 
@@ -202,7 +202,7 @@ namespace TestProject
 				if(expect != icdfp)
 					Console.ForegroundColor = ConsoleColor.Magenta;
 				//Console.WriteLine(j);
-				Console.WriteLine("反向查询 " + j + " 概率 " + value + " 的结果为 " + icdfp);
+				Console.WriteLine(" " + j + " 概率 " + value + " 的结果为 " + icdfp);
 				//Console.WriteLine();
 				Console.ResetColor();
 			}

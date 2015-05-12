@@ -484,15 +484,15 @@ namespace TestProject
             if(root == null)
                 throw new NotSupportedException();
             double k = (double)countNum / SampleSize;
-            //Console.WriteLine(node.Key + "k value "+ k);
-           // Console.WriteLine(node.Key+" Count less and equal : "+countNum);
+           //Console.WriteLine(node.Key + "k value "+ k);
+           // Console.WriteLine(node.Key + " Count less and equal : " + countNum+"  Probility :"+ k);
 
             if(p < k && node.Left != null)
             {
-                countNum = countNum -
-                    (node.Left.Right == null ? 0 : node.Left.Right.SubTreeSize) -
-                    (node.Left.Right == null ? 0 : node.Left.Right.CountThis)
-                    - node.Left.CountThis;
+               
+                countNum=countNum-(node.Left.Right==null ? 0 : node.Left.Right.SubTreeSize)
+                    -(node.Left.Right==null ? 0 : node.Left.Right.CountThis)
+                    -node.CountThis;
                 return ICDFHelper(node.Left, p, countNum);
             }
             if(p > k)
@@ -504,8 +504,6 @@ namespace TestProject
                         + node.Right.CountThis;
                     return ICDFHelper(node.Right, p, countNum);
                 }
-                if(node.Parent != null && node.Parent.Left == node)
-                    return node.Parent.Key;
             }
             return node.Key;
         }
