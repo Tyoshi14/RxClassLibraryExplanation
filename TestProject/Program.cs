@@ -130,17 +130,17 @@ namespace TestProject
             //    else if (item.isRed)
             //    {
             //        //  subTreeSize is used to see whether we get the right subtree number
-            //        Console.WriteLine("   " + item.key + " Red" + " subTreeSize: " + item.subtreesize);
+            //        Console.WriteLine("   " + item.key + " Red" + " count: " + item.subtreesize);
             //    }
             //    else
             //    {
-            //        Console.WriteLine("   " + item.key + " Black" + " subTreeSize: " + item.subtreesize);
+            //        Console.WriteLine("   " + item.key + " Black" + " count: " + item.subtreesize);
             //    }
             //}
 
 			// To test CDF fand ICDF
 
-			for(int j = 0;j < 130;j++)
+			for(int j = 0;j <130;j++)
 			{
 				double value = tree.CDF(j);
 				int expect;

@@ -47,7 +47,7 @@ namespace TestProject
              // Use the inner recursive function to get the sample size.
              //   return root.Count;
              // There we use the new  member variable to calculate the sample size.
-                return root.SubTreeSize + root.CountThis;
+                return root.count;
             }
         }
         public void Add(T sample, ulong number = 1)
@@ -64,8 +64,7 @@ namespace TestProject
         {
             ulong countLess = 0;
             if (root != null) {
-                countLess = root.SubTreeSize + root.CountThis 
-                    - (root.Right == null ? 0 : root.Right.SubTreeSize) - (root.Right == null ? 0 : root.Right.CountThis);
+                countLess = root.count - (root.Right == null ? 0 : root.Right.count);
             }
             return ICDFHelper(root, p, countLess);
         }
@@ -207,7 +206,7 @@ namespace TestProject
                     quene.Enqueue(signal);
                     continue;
                 }
-                list.Add(new returnNode(node.Key, node.IsRed, node.SubTreeSize));
+                list.Add(new returnNode(node.Key, node.IsRed, node.count));
 
                 if(node.Left != null)
                 {
@@ -316,34 +315,13 @@ namespace TestProject
         {
             Node leftChildren = node.Left;
             // Adjust the subtreeSize
-            node.SubTreeSize = (node.Right == null ? 0 : node.Right.SubTreeSize+node.Right.CountThis) + (leftChildren.Right == null ? 0 : leftChildren.Right.SubTreeSize+leftChildren.Right.CountThis);
-            leftChildren.SubTreeSize = (leftChildren.Left == null ? 0 : leftChildren.Left.SubTreeSize+leftChildren.Left.CountThis) + node.SubTreeSize+node.CountThis;
+            node.count = (node.Right == null ? 0 : node.Right.count) 
+                + (leftChildren.Right == null ? 0 : leftChildren.Right.count)
+                +node.CountThis;
+            leftChildren.count = (leftChildren.Left == null ? 0 : leftChildren.Left.count) 
+                +node.count
+                +leftChildren.CountThis;
             
-            //if (leftChildren.Left == null)
-            //{
-            //    leftChildren.SubTreeSize = 0 + node.SubTreeSize;
-            //}
-            //else {
-            //    leftChildren.SubTreeSize = leftChildren.Left.SubTreeSize + node.SubTreeSize;
-            //}
-           
-
-            //if (node.Right == null && leftChildren.Right == null)
-            //{
-            //    node.SubTreeSize = 0;
-            //}
-            //else if (node.Right == null)
-            //{
-            //    node.SubTreeSize = leftChildren.Right.SubTreeSize;
-            //}
-            //else if (leftChildren.Right == null)
-            //{
-            //    node.SubTreeSize = node.Right.SubTreeSize;
-            //}
-            //else {
-            //    node.SubTreeSize = leftChildren.Right.SubTreeSize + node.Right.SubTreeSize;
-            //}
-
             // Perform the rotation
             node.Left = leftChildren.Right;
             if(leftChildren.Right != null)
@@ -375,8 +353,12 @@ namespace TestProject
             Node rightChild = node.Right;
 
             // adjust the subtreeSize 
-            node.SubTreeSize = (node.Left == null ? 0 : node.Left.SubTreeSize + node.Left.CountThis) + (rightChild.Left == null ? 0 : rightChild.Left.SubTreeSize + rightChild.Left.CountThis);
-            rightChild.SubTreeSize = node.SubTreeSize + node.CountThis + (rightChild.Right == null ? 0 : rightChild.Right.SubTreeSize + rightChild.Right.CountThis);
+            node.count = (node.Left == null ? 0 : node.Left.count) 
+                + (rightChild.Left == null ? 0 : rightChild.Left.count)
+                +node.CountThis;
+            rightChild.count = node.count 
+                + (rightChild.Right == null ? 0 : rightChild.Right.count)
+                +rightChild.CountThis;
          
             // Adjust the rotation
             node.Right = rightChild.Left;
@@ -419,7 +401,7 @@ namespace TestProject
                 node.Parent = parent;
                 return node;
             }else {
-                node.SubTreeSize+=number;
+                node.count += number;
             }
             int cmp = comparer.Compare(sample, node.Key);
             if(cmp < 0)
@@ -430,7 +412,6 @@ namespace TestProject
             checked
             {
                 node.CountThis += number;
-                node.SubTreeSize -= number;
             }
             return node;
         }
@@ -459,16 +440,16 @@ namespace TestProject
             {
                 if (node.Right == null)
                 {
-                    countNum += node.SubTreeSize + node.CountThis;
+                    countNum += node.count;
                     return (double)countNum / SampleSize;
                 }
                 //为什么要提前减去右子树的两个计数？
                 // 因为countNum保存的是所有小于node结点的结点的个数。
-                countNum = countNum + node.SubTreeSize + node.CountThis - node.Right.SubTreeSize - node.Right.CountThis;
+                countNum = countNum + node.count - node.Right.count;
                 return CDFHelper(node.Right, value,countNum);
             }
 
-            countNum = countNum + node.SubTreeSize + node.CountThis - (node.Right == null ? 0 : node.Right.SubTreeSize) - (node.Right == null ? 0 : node.Right.CountThis);
+            countNum = countNum + node.count - (node.Right == null ? 0 : node.Right.count);
             return (double)countNum / SampleSize;
         }
         /// <summary>
@@ -485,23 +466,19 @@ namespace TestProject
                 throw new NotSupportedException();
             double k = (double)countNum / SampleSize;
            //Console.WriteLine(node.Key + "k value "+ k);
-           // Console.WriteLine(node.Key + " Count less and equal : " + countNum+"  Probility :"+ k);
+          // Console.WriteLine(node.Key + " Count less and equal : " + countNum+"  Probility :"+ k);
 
             if(p < k && node.Left != null)
             {
                
-                countNum=countNum-(node.Left.Right==null ? 0 : node.Left.Right.SubTreeSize)
-                    -(node.Left.Right==null ? 0 : node.Left.Right.CountThis)
-                    -node.CountThis;
+                countNum=countNum-(node.Left.Right==null ? 0 : node.Left.Right.count) -node.CountThis;
                 return ICDFHelper(node.Left, p, countNum);
             }
             if(p > k)
             {
                 if (node.Right != null)
                 {
-                    countNum = countNum + (node.Right.Left == null ? 0 : node.Right.Left.SubTreeSize) 
-                        + (node.Right.Left == null ? 0 : node.Right.Left.CountThis) 
-                        + node.Right.CountThis;
+                    countNum = countNum + (node.Right.Left == null ? 0 : node.Right.Left.count)+ node.Right.CountThis;
                     return ICDFHelper(node.Right, p, countNum);
                 }
             }
@@ -535,7 +512,7 @@ namespace TestProject
         {
             public T Key;//key value
             public ulong CountThis;//number of samples that Compare(smaple,Key)==0
-            public ulong SubTreeSize; // the number of nodes in the subtree.
+            public ulong count; // the number of nodes in the subtree.
             public Node Left;//left subtree to store Compare(smaple,Key)<0
             public Node Right;//right subtree to store Compare(sample,Key)>0
             public Node Parent;//for easier tree traversal 这样就可以写递归的算法 如果能够写出不使用的更好
@@ -545,7 +522,7 @@ namespace TestProject
                 this.Key = sample;
                 this.CountThis = number;
                 this.IsRed = isRed;// The default color will be red, we never need to create a black node directly.
-                this.SubTreeSize = 0;
+                this.count = 1;
             }
         }
     }
