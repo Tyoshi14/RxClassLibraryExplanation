@@ -102,13 +102,6 @@ namespace TestProject
             // testECDF();
 
             // Use the extend data structure to get CDF.
-            CDFTree<int> tree = new CDFTree<int>();
-           int[] array = {1,128,2,64,4,32,8,16,2,32};
-           // int[] array = { 3, 10, 7, 11, 9, 4, 2};
-            for (int i = 0; i < array.Length; i++)
-            {
-                tree.Add(array[i], 1);
-            }
 
             //var element = tree.getTreeInOrderWalk();
             //foreach (var elem in element)
@@ -138,98 +131,36 @@ namespace TestProject
             //    }
             //}
 
-			// To test CDF fand ICDF
-
-			for(int j = 0;j <130;j++)
-			{
-				double value = tree.CDF(j);
-				int expect;
-				if(j < 1)
-				{
-					expect = 1;//this is wrong
-					if(value != 0)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				else if(j < 2)
-				{
-					expect = 1;
-					if(value != 0.1)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				else if(j < 4)
-				{
-					expect = 2;
-					if(value != 0.3)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				else if(j < 8)
-				{
-					expect = 4;
-					if(value != 0.4)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				else if(j < 16)
-				{
-					expect = 8;
-					if(value != 0.5)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				else if(j < 32)
-				{
-					expect = 16;
-					if(value != 0.6)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				else if(j < 64)
-				{
-					expect = 32;
-					if(value != 0.8)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				else if(j < 128)
-				{
-					expect = 64;
-					if(value != 0.9)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				else
-				{
-					expect = 128;
-					if(value != 1)
-						Console.ForegroundColor = ConsoleColor.Red;
-				}
-				var icdfp = tree.ICDF(value);
-				if(expect != icdfp)
-					Console.ForegroundColor = ConsoleColor.Magenta;
-				//Console.WriteLine(j);
-				Console.WriteLine(" " + j + " 概率 " + value + " 的结果为 " + icdfp);
-				//Console.WriteLine();
-				Console.ResetColor();
-			}
+            // To test CDF fand ICDF
 
 
+            CDFTreeTest1();
+            CDFTreeTest2();
 
+            Console.ReadLine();
 
-			//TestCDFTree("");
-			//TestCDFTree("A");
-			//TestCDFTree("A+B");
-			//TestCDFTree("B+A");
-			//TestCDFTree("D[BF][ACEG]");
-			//TestCDFTree("B[AD][CF][EG]");
-			//TestCDFTree("F[DG][BE][AC]");
-			//TestCDFTree("B[AF][DG][CE]");
-			//TestCDFTree("F[BG][AD][CE]");
-			//Random r = new Random();
-			//for (int i = 0; i < 10; i++)
-			//{
-			//    int n = r.Next(0, 64);
-			//    char[] cs = new char[n];
-			//    for (int j = 0; j < n; j++)
-			//        cs[j] = (char)('A' + r.Next(26));
-			//    TestCDFTree(new string(cs));
-			//}
+        }
 
-			Console.ReadLine();
+        private static void CDFTreeTest2()
+        {
+            TestCDFTree("");
+            TestCDFTree("A");
+            TestCDFTree("A+B");
+            TestCDFTree("B+A");
+            TestCDFTree("D[BF][ACEG]");
+            TestCDFTree("B[AD][CF][EG]");
+            TestCDFTree("F[DG][BE][AC]");
+            TestCDFTree("B[AF][DG][CE]");
+            TestCDFTree("F[BG][AD][CE]");
+            Random r = new Random();
+            for(int i = 0; i < 10; i++)
+            {
+                int n = r.Next(0, 512);
+                char[] cs = new char[n];
+                for(int j = 0; j < n; j++)
+                    cs[j] = (char)('A' + r.Next(26));
+                TestCDFTree(new string(cs));
+            }
 
         }
 
@@ -237,7 +168,8 @@ namespace TestProject
         {
             Console.WriteLine("Testing: {0}", testInput);
             string expectedOutput = SortedSet<char>.Serielize(SortedSet<char>.Create(testInput), k => k.ToString());
-            string testOutput = CDFTree<char>.Serielize(CDFTree<char>.Create(testInput), k => k.ToString());
+            var tree = CDFTree<char>.Create(testInput);
+            string testOutput = CDFTree<char>.Serielize(tree, k => k.ToString());
             Console.WriteLine("Expecting: {0}", expectedOutput);
             Console.WriteLine("Get:       {0}", testOutput);
             if(testOutput.Equals(expectedOutput))
@@ -251,9 +183,117 @@ namespace TestProject
                 Console.WriteLine("Fail!");
             }
             Console.ResetColor();
+            var freqDict = new System.Collections.Generic.Dictionary<char, int>();
+            int n = 0;
+            foreach(var k in testInput)
+                if(k >= 'A' && k <= 'Z')
+                {
+                    n++;
+                    if(freqDict.ContainsKey(k))
+                        freqDict[k]++;
+                    else
+                        freqDict[k] = 1;
+                }
+            int m= 0;
+            for(char k = 'A'; k <= 'Z'; k++)
+            {
+                m += freqDict.ContainsKey(k) ? freqDict[k] : 0;
+                if((double)m/n==tree.CDF(k))
+                    Console.ForegroundColor = ConsoleColor.Green;
+                else
+                    Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(k);
+            }
+            Console.ResetColor();
             Console.WriteLine();
         }
 
+        private static void CDFTreeTest1()
+        {
+            CDFTree<int> tree = new CDFTree<int>();
+            int[] array ={
+1   ,
+50  ,
+2   ,
+37  ,
+5   ,
+26  ,
+10  ,
+17  ,
+26  ,
+2
+ };
+            for(int i = 0; i < array.Length; i++)
+                tree.Add(array[i], 1);
+            for(int j = 0; j <= 51; j++)
+            {
+                double value = tree.CDF(j);
+                int expect;
+                if(j < 1)
+                {
+                    expect = 1;//this is wrong
+                    if(value != 0)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if(j < 2)
+                {
+                    expect = 1;
+                    if(value != 0.1)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if(j < 5)
+                {
+                    expect = 2;
+                    if(value != 0.3)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if(j < 10)
+                {
+                    expect = 5;
+                    if(value != 0.4)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if(j < 17)
+                {
+                    expect = 10;
+                    if(value != 0.5)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if(j < 26)
+                {
+                    expect = 17;
+                    if(value != 0.6)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if(j < 37)
+                {
+                    expect = 26;
+                    if(value != 0.8)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else if(j < 50)
+                {
+                    expect = 37;
+                    if(value != 0.9)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                else
+                {
+                    expect = 50;
+                    if(value != 1)
+                        Console.ForegroundColor = ConsoleColor.Red;
+                }
+                var icdfp = tree.ICDF(value);
+                if(expect != icdfp)
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                //Console.WriteLine(j);
+                Console.WriteLine(" " + j + " 概率 " + value + " 的结果为 " + icdfp);
+                //Console.WriteLine();
+                Console.ResetColor();
+            }
+            Console.WriteLine("CDFTreeTest1 Finished.");
+        }
+        
         private class myob : IObserver<int>
         {
 
